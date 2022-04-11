@@ -180,7 +180,7 @@ function hopfield(){
         yaxis:{
             range:[0,10]
         },
-        title:"noise added"
+        title:"Corrupted Patteerns"
     };
     let config2 = {
         responsive:true,
@@ -201,7 +201,7 @@ function hopfield(){
         yaxis:{
             range:[0,10]
         },
-        title:"graph generated back"
+        title:"Recovered Patterns"
     };
     
     Plotly.newPlot('myPlot3',data3, layout3);
