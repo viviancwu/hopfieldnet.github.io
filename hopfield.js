@@ -1,8 +1,18 @@
 
 function hopfield(){
+    var number = document.getElementById("memorysize").value;
+
+
+
+    var matrix = new Array(10);
+    for(let i=0; i<10; i++){
+        matrix[i]=new Array(10);
+        matrix[i].fill(0);
+    }
+    for(var k=1; k<=number; k++){
     for(let i=1; i<11; i++){
         for(let j=1; j<11; j++){
-            var position = i+","+j;
+            var position = k+","+i+","+j;
             var cb = document.getElementById(position).checked;
             if(cb){
                 matrix[i-1][j-1]=-1;
@@ -11,10 +21,16 @@ function hopfield(){
                 matrix[i-1][j-1]=1;
             }
         }
+        }
+        window["matrix"+k] = JSON.parse(JSON.stringify(matrix));
     }
     //must reshape sheesh
+    for(let i=1; i<=number; i++){
+        eval('var matrix = matrix'+i+';');
+        let newMatrix = reshape(matrix);
+        window["newMatrix"+i] = JSON.parse(JSON.stringify(newMatrix));
 
-    let newMatrix = reshape(matrix);
+    }
     //my new n size=100, it becomes an 100x1 matrix
 
     //generate weights
@@ -23,6 +39,8 @@ function hopfield(){
         weight[i]=new Array(100);
         weight[i].fill(0);
     }
+    for(let k=1; k<=number; k++){
+    eval('var newMatrix = newMatrix'+k+';');
     for(let i=0; i<100; i++){
         for(let j=0; j<100; j++){
             let waux=0;
@@ -35,12 +53,17 @@ function hopfield(){
         }
         weight[i][i]=0;
     }
+    window["weight"+k] = JSON.parse(JSON.stringify(weight));
+ 
+}
     //.log(weight);
     //add noise
     var noiseLevel = document.getElementById("noiselevel").value;
     var p_val = noiseLevel/100;
     let results1 = new Array(mem.length).fill(0);
-    var mem_test = JSON.parse(JSON.stringify(matrix));
+    for(let k=1; k<=number; k++){
+    eval('var mem_test = JSON.parse(JSON.stringify(matrix'+k+'));');
+    eval('var matrix = matrix'+k+';');
     var countReplacements=0;
     for(let i=0; i<10; i++){
         for(let j=0; j<10; j++){
@@ -55,17 +78,33 @@ function hopfield(){
         const arrayColumn = (arr, n) => arr.map(x=>x[n]);
         results1[i]=hamming_distance(arrayColumn(mem_test, i), arrayColumn(matrix,i));
     }
+    window["mem_test"+k] = JSON.parse(JSON.stringify(mem_test));
+}
+
 
     //recall origianl memory
-    var mem_work = reshape(mem_test);
+    for(var i=1; i<=number; i++){
+        eval('var mem_work'+i+'= reshape(mem_test'+i+');')
+    }
+    //iterate through all the weights and see which one it's able to recall
     let results2 = new Array(mem.length).fill(0);
     let inside = new Array(10).fill(0);
-    let mem_rec = new Array(10).fill(inside);
-    //var mem_work = JSON.parse(JSON.stringify(mem_test));
-        let s = new Array(100).fill(0);
         //let s_old = mem_work;
         let n_iters =0;
+        //for(var k=1; k<=number; k++){
+            whichmem=0;
+            min=Infinity;
+            newmin=0;
+            //eval('var mem_work = mem_work'+k+';');
+        for(var p=1; p<=number; p++){
+        let s = new Array(100).fill(0);
+        eval('var newMatrix = newMatrix'+p+';');
+        eval('var matrix = matrix'+p+';');
+        eval('weight = weight'+p+';');
+        eval('var mem_work = mem_work'+p+';');
+        let s_old = mem_work;
         let go=true;
+
         while(go){
             for(let i=0; i<100; i++){
                 let waux=0;
@@ -82,31 +121,50 @@ function hopfield(){
                     s[n]=-1;
                 }
             }
-           /* for(let i=0; i<10; i++){
-                mem_work[i][m]=s[i];
-            }*/
-            n_iters++;
-            let count=0;
+            mem_work = JSON.parse(JSON.stringify(s));
+            var count=0;
             for(let i=0; i<100; i++){
-                if(newMatrix[i]==s[i]){
+                if(s_old[i]==s[i]){
                     count++;
                 }
+                else{
+                    break;
+                }
             }
-            console.log(s);
-            console.log(newMatrix);
             if(count==100){
                 go=false;
             }
-            mem_work=s;
+            s_old=s;
         }
         const arrayColumn = (arr, n) => arr.map(x=>x[n]);
+        var distance = hamming_distance(s, newMatrix);
+        console.log(distance);
+        if(distance<min){
+            min=distance;
+            whichmem=p;
+        }
+        let m=0;
+        let matrixback = new Array(10);
+        for(let i=0; i<10; i++){
+            matrixback[i]=new Array(10).fill(0);
+        }
+        for(let i=0; i<10; i++){
+            for(let j=0; j<10; j++){
+                matrixback[i][j]=s[m];
+                m++;
+            }
+        }
+        eval('var matrixback'+p+'= matrixback;');
+    }
+
+        //const arrayColumn = (arr, n) => arr.map(x=>x[n]);
         //results2[m]=hamming_distance(s, arrayColumn(matrix, m));
         //s should now be the same as my old Matrix
        /* for(let i=0; i<10; i++){
             mem_rec[i][m]=s[i];
         }
     console.log(results2);*/
-    console.log(s);
+   /* console.log(s);
     var m=0;
     let matrixback = new Array(10);
     for(let i=0; i<10; i++){
@@ -117,10 +175,14 @@ function hopfield(){
             matrixback[i][j]=s[m];
             m++;
         }
-    }
+    }*/
 
-    //plot initial
-    var xInitial = [];
+    //plot 
+    for(let k=1; k<=number; k++){
+    eval('var matrix = matrix'+k+';');
+    eval('var mem_test = mem_test'+k+';');
+    eval('var matrixback = matrixback'+k+';');
+    var xInitial= [];
     var yInitial=[];
     var xNoise=[]; 
     var yNoise=[];
@@ -163,7 +225,7 @@ function hopfield(){
         responsive:true,
     };
 
-    Plotly.newPlot('myPlot1', data, layout);
+    Plotly.newPlot('myPlot'+k+'.1', data, layout);
 
     //plot with noise
     let data2 =[{
@@ -185,7 +247,7 @@ function hopfield(){
     let config2 = {
         responsive:true,
     };
-    Plotly.newPlot('myPlot2',data2, layout2);
+    Plotly.newPlot('myPlot'+k+'.2',data2, layout2);
 
     //plot matrixback
     let data3 = [{
@@ -204,9 +266,12 @@ function hopfield(){
         title:"Recovered Patterns"
     };
     
-    Plotly.newPlot('myPlot3',data3, layout3);
+    Plotly.newPlot('myPlot'+k+'.3',data3, layout3);
 
+    }
+    
 }
+ 
 
 
 function hamming_distance(m1, m2){
@@ -259,3 +324,16 @@ var matrix = [
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0]
 ]
+
+function determine(){
+    var value=document.getElementById("memorysize").value;
+    console.lot(value);
+    var i=1;
+    for(i; i<value; i++){
+        document.getElementById("mem"+value).style.display="block";
+    }
+    for(i; i<11; i++){
+        document.getElementById("mem"+value).style.display="none";
+    }
+}
+
