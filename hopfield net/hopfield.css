@@ -1,0 +1,38 @@
+#heading{
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    transition:1s;
+    background-color: rgb(255,192,203);
+    animation: pink-to-lightpink 1s linear 0s 1 alternate-reverse;
+    
+}
+/*#matrix{
+    visibility:hidden;
+}*/
+
+#heading:hover{
+    background-color: rgba(255,192,203, 0.3);
+}
+
+button{
+    background-color: rgb(128, 158, 255);
+    transition: 0.4s;
+}
+button:hover{
+    background-color: rgba(128, 158, 255, 0.5);
+    padding:10px 10px;
+}
+
+#final{
+    height:50px;
+}
+
+@keyframes pink-to-lightpink {
+    from{
+        background: rgb(255,192,203);
+    }
+    to{
+        background: rgba(255,192,203, 0.3);
+    }
+}

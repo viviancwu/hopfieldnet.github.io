@@ -1,0 +1,60 @@
+#memory{
+    display:flex;
+    justify-content: center;
+    font-family:sans-serif;
+    top: 50%;
+    color: white;
+    background-color: rgb(255, 165, 0);
+    padding: 10px 0px;
+    transition:0.4s;
+
+}
+#memory:hover{
+    background-color: rgba(255, 165, 0, 0.9);
+    padding:20px;
+    
+}
+
+#phgy311 {
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+}
+
+
+#inside{
+    display:flex;
+    justify-content:center;
+    font-family:Arial, Helvetica, sans-serif;
+    height:60px; 
+}
+
+#memorysize{
+    height:60px;
+}
+
+#memorysizeb{
+    height:60px;
+}
+
+button{
+    background-color:rgba(104, 104, 227, 0.7);
+    transition: 0.4s;
+}
+button:hover{
+    background-color:rgba(104, 104, 227, 0.3);
+
+}
+
+#matrix{
+    visibility:hidden; 
+}
+
+#errormsg{
+    display:flex;
+    justify-content:center; 
+    font-family:Arial, Helvetica, sans-serif;
+    font-style: italic;
+    padding-top: 1%;
+}
+
