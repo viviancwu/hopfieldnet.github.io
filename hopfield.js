@@ -1,72 +1,114 @@
+const { min, derivative, dotDivide, all, identity, ConditionalNodeDependencies, row } = require("mathjs");
+const { selectPoints } = require("plotly.js/lib/bar");
+let inputmatrices=[];
+
 
 function hopfield(){
-    var number = document.getElementById("memorysize").value;
+    inputmatrices=[];
+    $(".grid").remove();
+    
+
+    
+    const plot = document.getElementById("allPlots");
+    plot.style.display="grid";
+    document.querySelectorAll(".plots").forEach(a=>a.style.visibility="visible");
+
+    const tohide = document.getElementById("matrix");
+    //tohide.style.visibility="hidden";
+    let numberof = document.getElementById("memorynum").value;
+    if(numberof==""){
+    var number = sessionStorage.getItem("MemoryNum");
+    }
+    else{
+        var number = numberof;
+    }
+
+    const matrixSize = document.getElementById("matrixSize").value;
 
 
 
-    var matrix = new Array(10);
-    for(let i=0; i<10; i++){
-        matrix[i]=new Array(10);
+    var matrix = new Array(matrixSize);
+    for(let i=0; i<matrixSize; i++){
+        matrix[i]=new Array(matrixSize);
         matrix[i].fill(0);
     }
     for(var k=1; k<=number; k++){
-    for(let i=1; i<11; i++){
-        for(let j=1; j<11; j++){
+    for(let i=1; i<=matrixSize; i++){
+        for(let j=1; j<=matrixSize; j++){
             var position = k+","+i+","+j;
-            var cb = document.getElementById(position).checked;
-            if(cb){
+            var cb = document.getElementById(position).style.backgroundColor;
+            if(cb!='white'){
                 matrix[i-1][j-1]=-1;
             }
             else{
                 matrix[i-1][j-1]=1;
             }
         }
-        }
+    }
         window["matrix"+k] = JSON.parse(JSON.stringify(matrix));
+        //deep copy
     }
     //must reshape sheesh
     for(let i=1; i<=number; i++){
         eval('var matrix = matrix'+i+';');
-        let newMatrix = reshape(matrix);
-        window["newMatrix"+i] = JSON.parse(JSON.stringify(newMatrix));
-
+        let newMatrix = reshape(matrix, matrixSize);
+        eval('var newMatrix'+i+'= newMatrix;');
+        //window["newMatrix"+i] = JSON.parse(JSON.stringify(newMatrix));
     }
     //my new n size=100, it becomes an 100x1 matrix
 
     //generate weights
-    let weight = new Array(10);
-    for(let i=0; i<100; i++){
-        weight[i]=new Array(100);
+    let weight = new Array(matrixSize);
+    let numlist = [];
+    let weightsize = matrixSize*matrixSize;
+    for(let i=0; i<weightsize; i++){
+        weight[i]=new Array(weightsize);
         weight[i].fill(0);
+        numlist.push(i);
     }
     for(let k=1; k<=number; k++){
-    eval('var newMatrix = newMatrix'+k+';');
-    for(let i=0; i<100; i++){
-        for(let j=0; j<100; j++){
-            let waux=0;
-            for(let m=0; m<1; m++){
-                waux += newMatrix[i]*newMatrix[j];
+        eval('var newMatrix = newMatrix'+k+';');
+        for(let i=0; i<weightsize; i++){
+            for(let j=0; j<weightsize; j++){
+                let waux=0;
+                for(let m=0; m<1; m++){
+                    waux += newMatrix[i]*newMatrix[j];    
+                }
+                waux=waux/number;
+                weight[i][j]=waux;
+                weight[j][i]=waux;
             }
-            waux = waux/1;
-            weight[i][j]=waux;
-            weight[j][i]=waux;
+            weight[i][i]=0;
         }
-        weight[i][i]=0;
+        window["weight"+k] = JSON.parse(JSON.stringify(weight));
     }
-    window["weight"+k] = JSON.parse(JSON.stringify(weight));
+    
+    
  
-}
-    //.log(weight);
+    weight = new Array(10);
+    for(let i=0; i<weightsize; i++){
+        weight[i]=new Array(weightsize);
+        weight[i].fill(0);
+    }   
+    for(var i=0;i<weightsize; i++){
+        for(var j=0; j<weightsize; j++){
+            for(var p=1; p<=number; p++){
+                eval('weight[i][j] += weight'+p+'[i][j];')
+            }
+        }
+
+    }
+
     //add noise
     var noiseLevel = document.getElementById("noiselevel").value;
     var p_val = noiseLevel/100;
-    let results1 = new Array(mem.length).fill(0);
+    let results1 = new Array(number).fill(0);
     for(let k=1; k<=number; k++){
     eval('var mem_test = JSON.parse(JSON.stringify(matrix'+k+'));');
     eval('var matrix = matrix'+k+';');
     var countReplacements=0;
-    for(let i=0; i<10; i++){
-        for(let j=0; j<10; j++){
+    for(let i=0; i<matrixSize; i++){
+        for(let j=0; j<matrixSize; j++){
             if(Math.random()<p_val){
                 mem_test[j][i]=-mem_test[j][i];
                 countReplacements++;
@@ -78,52 +120,84 @@ function hopfield(){
         const arrayColumn = (arr, n) => arr.map(x=>x[n]);
         results1[i]=hamming_distance(arrayColumn(mem_test, i), arrayColumn(matrix,i));
     }
-    window["mem_test"+k] = JSON.parse(JSON.stringify(mem_test));
-}
+    var mem_work = reshape(mem_test, matrixSize);
+    eval('var mem_test'+k+'= mem_test;');
+    eval('var mem_work'+k+'= mem_work;');
+    }
 
 
     //recall origianl memory
-    for(var i=1; i<=number; i++){
-        eval('var mem_work'+i+'= reshape(mem_test'+i+');')
-    }
     //iterate through all the weights and see which one it's able to recall
-    let results2 = new Array(mem.length).fill(0);
-    let inside = new Array(10).fill(0);
+    let inside = new Array(matrixSize).fill(0);
         //let s_old = mem_work;
         let n_iters =0;
         //for(var k=1; k<=number; k++){
-            whichmem=0;
-            min=Infinity;
-            newmin=0;
+            var whichmem=0;
+            var min=Infinity;
+            var newmin=0;
             //eval('var mem_work = mem_work'+k+';');
+        //iterate for each matrix
+        const newnumlist = JSON.parse(JSON.stringify(numlist));
+        var inputmatrices=[];
+        var alllyapunov=[];
         for(var p=1; p<=number; p++){
-        let s = new Array(100).fill(0);
+        numlist = JSON.parse(JSON.stringify(newnumlist));
         eval('var newMatrix = newMatrix'+p+';');
         eval('var matrix = matrix'+p+';');
-        eval('weight = weight'+p+';');
+        //eval('weight = weight'+p+';');
         eval('var mem_work = mem_work'+p+';');
-        let s_old = mem_work;
+        const mem_work_start = JSON.parse(JSON.stringify(mem_work));
+        let s = mem_work;
+        let s_old = s;
         let go=true;
-
+        var t=0;
+        E_temp=[];
+        var counterfornow=0;
+        for(var q=0; q<weightsize; q++){
+            for(var w=0; w<weightsize; w++){
+                counterfornow+= -1/2*weight[q][w]*s[q]*s[w];
+            }         
+        }
+        E_temp.push(counterfornow);
+        alllyapunov.push(counterfornow);
+        inputmatrices.push(mem_work_start);
+        variable=1;
         while(go){
-            for(let i=0; i<100; i++){
+            for(var iter=weightsize; iter>0; iter--){
+                var value = Math.floor(Math.random()*iter);
+                var i=numlist[value];
+                numlist.splice(value, 1);
                 let waux=0;
-                for(let j=0; j<100; j++){
-                    waux = waux+weight[i][j]*mem_work[j];
+                var olds = s[i];
+                for(let j=0; j<weightsize; j++){
+                    waux = waux+weight[i][j]*s[j];
                 }
                 s[i]=waux;
-            }
-            for(let n=0; n<100; n++){
-                if(s[n]>0){
-                    s[n]=1;
+                if(s[i]>0){
+                    s[i]=1;
                 }
-                else if(s[n]<1){
-                    s[n]=-1;
+                else if(s[i]<1){
+                    s[i]=-1;
+                }
+                if(variable==1){
+                    eval('var cloneS'+i+'= JSON.parse(JSON.stringify(s));');
+                    eval('inputmatrices.push(cloneS'+i+');');
+                }
+                counterfornow=0;
+                for(var q=0; q<weightsize; q++){
+                    for(var w=0; w<weightsize; w++){
+                        counterfornow+= -1/2*weight[q][w]*s[q]*s[w];
+                    }
+                }
+                E_temp.push(counterfornow);
+                if(variable==1){
+                    alllyapunov.push(counterfornow);
                 }
             }
+            
             mem_work = JSON.parse(JSON.stringify(s));
             var count=0;
-            for(let i=0; i<100; i++){
+            for(let i=0; i<weightsize; i++){
                 if(s_old[i]==s[i]){
                     count++;
                 }
@@ -131,148 +205,204 @@ function hopfield(){
                     break;
                 }
             }
-            if(count==100){
-                go=false;
+            if(count==weightsize){
+                if(variable==1){
+                    variable++;
+                    numlist = JSON.parse(JSON.stringify(newnumlist))
+                }
+                else{
+                    go=false;
+                    numlist = JSON.parse(JSON.stringify(newnumlist))
+                }
             }
             s_old=s;
         }
         const arrayColumn = (arr, n) => arr.map(x=>x[n]);
         var distance = hamming_distance(s, newMatrix);
-        console.log(distance);
         if(distance<min){
             min=distance;
             whichmem=p;
         }
         let m=0;
-        let matrixback = new Array(10);
-        for(let i=0; i<10; i++){
-            matrixback[i]=new Array(10).fill(0);
+        let matrixback = new Array(matrixSize);
+        for(let i=0; i<matrixSize; i++){
+            matrixback[i]=new Array(matrixSize).fill(0);
         }
-        for(let i=0; i<10; i++){
-            for(let j=0; j<10; j++){
+        for(let i=0; i<matrixSize; i++){
+            for(let j=0; j<matrixSize; j++){
                 matrixback[i][j]=s[m];
                 m++;
             }
         }
         eval('var matrixback'+p+'= matrixback;');
+        var lyapunov = E_temp;
+        eval('var lyapunov'+p+' = lyapunov;');
     }
 
-        //const arrayColumn = (arr, n) => arr.map(x=>x[n]);
-        //results2[m]=hamming_distance(s, arrayColumn(matrix, m));
-        //s should now be the same as my old Matrix
-       /* for(let i=0; i<10; i++){
-            mem_rec[i][m]=s[i];
+    sessionStorage.setItem("Matrices", inputmatrices);
+    sessionStorage.setItem("lyapunov", alllyapunov);
+
+    var test = document.getElementById("aPlot");
+
+    if(!test.hasChildNodes()){
+    //create cells
+    for(var k=0; k<=number; k++){
+        var mother;
+        if(k==0){
+            mother=document.getElementById('aPlot');
+            v=3;
         }
-    console.log(results2);*/
-   /* console.log(s);
-    var m=0;
-    let matrixback = new Array(10);
-    for(let i=0; i<10; i++){
-        matrixback[i]=new Array(10).fill(0);
-    }
-    for(let i=0; i<10; i++){
-        for(let j=0; j<10; j++){
-            matrixback[i][j]=s[m];
-            m++;
+        else{
+            mother = document.getElementById('plot'+k);
+            v=1;
         }
-    }*/
+        mother.style.visibility="visible";
+        mother.style.display="block";
+        for(v; v<=3; v++){
+            let innerplot = document.createElement('td');
+            if(v==1){
+                innerplot.className = "matrix";
+            }
+            else if(v==2){
+                innerplot.className = "noise";
+            }
+            else if(v==3){
+                innerplot.className = "returned";
+            }
+            innerplot.id = k+','+v;
+            mother.appendChild(innerplot);
+            for(var p=1; p<=matrixSize; p++){
+                let rowsize = document.createElement('tr');
+                var value = k+','+v+','+p+',plot';
+                rowsize.id = value;
+                rowsize.style.height = 210/matrixSize+'px';
+                rowsize.style.width = matrixSize*170/matrixSize+'px';
+                //console.log(rownew);
+                innerplot.appendChild(rowsize);
+                 //rownew.style.width = 36/matrixSize*9;
+                 //rownew.style.height = 36/matrixSize*3;
+                 for(var l=1; l<=matrixSize; l++){
+                    const rownew = document.getElementById(k+','+v+','+p+',plot');
+                        let cell = document.createElement("td");
+                        cell.id = k+','+v+','+p+','+l;
+                        cell.className="Pcell";
+                        cell.style.minHeight=170/matrixSize+'px';
+                        cell.style.minWidth=170/matrixSize+'px';
+                        cell.style.Height=170/matrixSize+'px';
+                        cell.style.Width=170/matrixSize+'px';
+                        cell.style.backgroundColor="white";
+                        cell.style.border= "1px solid black";
+                        rownew.appendChild(cell);
+                }
+            }
+        }
+        if(k!=0){
+        let lyapunovplot = document.createElement('div');
+        lyapunovplot.style.visibility='visible';
+        lyapunovplot.id='Lyplot'+k;
+        lyapunovplot.className = "plots";
+        lyapunovplot.style.minWidth = "522px";
+        lyapunovplot.style.minHeight = "522px";
+        let cellplace = document.createElement('td');
+        cellplace.appendChild(lyapunovplot);
+        mother.appendChild(cellplace);
+        }
+    } 
+}
+    
 
     //plot 
+
     for(let k=1; k<=number; k++){
-    eval('var matrix = matrix'+k+';');
-    eval('var mem_test = mem_test'+k+';');
-    eval('var matrixback = matrixback'+k+';');
-    var xInitial= [];
-    var yInitial=[];
-    var xNoise=[]; 
-    var yNoise=[];
-    var xBack = [];
-    var yBack= [];
-    for(var i=0; i<10; i++){
-        for(var j=0; j<10; j++){
-            if (matrix[i][j]==-1){
-                xInitial.push(j);
-                yInitial.push(10-i);
+        var range1 = matrixSize+1;
+        eval('var matrix = matrix'+k+';');
+        eval('var mem_test = mem_test'+k+';');
+        eval('var matrixback = matrixback'+k+';');
+        eval('var lyapunov = lyapunov'+k+';');
+        eval('var lyapunov = lyapunov'+k+';');
+        var xlyapunov = [];
+        var Xaxis = lyapunov.length;
+        for(var x=0; x< Xaxis; x++){
+            xlyapunov.push(x);
             }
-            if(mem_test[i][j]==-1){
-                xNoise.push(j);
-                yNoise.push(10-i);
-            }
-            if(matrixback[i][j]==-1){
-                xBack.push(j);
-                yBack.push(10-i);
+    var plotMatrix;
+    for(var v=1; v<=3; v++){
+        if(v==1){
+            plotMatrix = matrix;
+        }
+        else if(v==2){
+            plotMatrix = mem_test;
+        }
+        else if(v==3){
+            plotMatrix = matrixback;
+        }
+        for(var p=0; p<matrixSize; p++){
+            for (var l=0; l<matrixSize; l++){
+                var posp = p+1;
+                var posl = l+1;
+                var cell = document.getElementById(k+','+v+','+posp+','+posl);
+                if(plotMatrix[p][l]==-1||plotMatrix[p][l]==0){
+                    cell.style.backgroundColor = 'black';
+                }
+                else{
+                    cell.style.backgroundColor = 'white';
+                }
             }
         }
     }
-    let data = [{
-        x: xInitial,
-        y: yInitial,
-        mode: "markers",
-        type: "scatter"
-    }];
+
     
+    //plot lyapunov
+    xrange = xlyapunov.length;
+    ysmall = lyapunov[lyapunov.length-1];
+    ylarge = lyapunov[0];
+    let data=[{
+        x:xlyapunov,
+        y:lyapunov,
+        type:"scatter"
+    }];
     let layout = {
         xaxis:{
-            range: [0,10]
-        },
-        yaxis: {
-            range: [0,10]
-        },
-        title:"original pattern"
-    };
-
-    let config = {
-        responsive:true,
-    };
-
-    Plotly.newPlot('myPlot'+k+'.1', data, layout);
-
-    //plot with noise
-    let data2 =[{
-        x: xNoise,
-        y: yNoise,
-        mode:"markers",
-        type:"scatter"
-    }];
-
-    let layout2 = {
-        xaxis:{
-            range:[0,10]
+            range:[0,xrange]
         },
         yaxis:{
-            range:[0,10]
+            range:[ysmall, ylarge]
         },
-        title:"Corrupted Patteerns"
+        autosize: false,
+        width: 500,
+        height: 500,
+        title:"Lyapunouv function"
     };
-    let config2 = {
-        responsive:true,
-    };
-    Plotly.newPlot('myPlot'+k+'.2',data2, layout2);
-
-    //plot matrixback
-    let data3 = [{
-        x: xBack,
-        y: yBack,
-        mode:"markers",
-        type:"scatter"
-    }];
-    let layout3 = {
-        xaxis:{
-            range:[0,10]
-        },
-        yaxis:{
-            range:[0,10]
-        },
-        title:"Recovered Patterns"
-    };
-    
-    Plotly.newPlot('myPlot'+k+'.3',data3, layout3);
+    Plotly.newPlot('Lyplot'+k, data, layout);
 
     }
-    
-}
- 
 
+
+    var animate = document.getElementById("animation").checked;
+    if(animate){
+        var startAni = document.getElementById("startAni");
+        var aniplot = document.getElementById("plot0");
+        startAni.style.display="flex";
+        aniplot.style.display="flex";  
+        var firstplot2 = document.getElementById("firstplot2");
+        firstplot2.style.display="flex";
+        
+        contAnimate();  
+    }
+    else{
+        var ani = document.getElementById("plot0");
+        ani.style.display="none";
+    }
+    var x=number;
+    for(x; x<=10; x++){
+        let plotnum = "plot"+x;
+        let inside = document.getElementById(plotnum);
+        inside.style.display="none";
+    }
+    let plotnum = "plot"+number;
+    let inner = document.getElementById(plotnum);
+    inner.style.display="flex";
+}
 
 function hamming_distance(m1, m2){
     let inside = new Array(1).fill(0);
@@ -290,20 +420,16 @@ function hamming_distance(m1, m2){
     return d;
 }
 
-function reshape(matrix){
-    let size1 = matrix.length;
-    let size2 = matrix[0].length;
+function reshape(matrix, matrixsize){
+
     let j = 0;
     let q = 0;
-
-    let newy = size2*size2;
-    let newx = size1/size2;
     //var reshapedinside = new Array(1).fill(0);
-    var reshaped = new Array(100).fill(0);
-        for(let m=0; m<100; m++){
-            reshaped[m]=matrix[j][q];
+    var reshaped = [];
+        for(let m=0; m<matrixsize*matrixsize; m++){
+            reshaped.push(matrix[j][q]);
             q++;
-            if(q==10){
+            if(q==matrixsize){
                 q=0;
                 j++;
             }
@@ -312,28 +438,274 @@ function reshape(matrix){
 
 }
 
-var matrix = [
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0]
-]
+function addMatrix(){
+    for(var i=1; i<=10; i++){
+        var value = "mem"+i;
+        var valueEl = document.getElementById(value);
+        valueEl.innerHTML="";
+    }
+let number = document.getElementById("memorynum").value;
+let matrixSize = document.getElementById("matrixSize").value;
 
-function determine(){
-    var value=document.getElementById("memorysize").value;
-    console.lot(value);
-    var i=1;
-    for(i; i<value; i++){
-        document.getElementById("mem"+value).style.display="block";
-    }
-    for(i; i<11; i++){
-        document.getElementById("mem"+value).style.display="none";
-    }
+if(number > 10 || number < 3 || matrixSize < 3 || matrixSize > 10){
+    var errormsg = document.getElementById("errormsg");
+    errormsg.innerText = "Input correct values!";
 }
+else{
+    var errormsg = document.getElementById("errormsg");
+    errormsg.innerText = "";
+var i=1;
+for(i=1; i<=number; i++){
+    var value = "mem"+i;
+    const mem1 = document.getElementById(value);
+    mem1.style.visibility="visible";
+    mem1.style.display="block";
+    mem1.style.padding= "10px";
+    //mem1.style.border= "1px solid black";
+    var tag = document.createElement("tr");
+    var value = 60*matrixSize;
+    //mem1.style.width=value+'px';
+    //mem1.style.heigth = value+'px';
+    for(var p=1; p<=matrixSize; p++){
+      /*  var middletag = document.createElement("tr");
+        middletag.style.border="1px solid black";
+        mem1.appendChild(middletag);*/
+        let myRow = document.createElement('tr');
+        mem1.appendChild(myRow);
+        myRow.id = p+','+i;
+        const rowi = document.getElementById(p+','+i);
+        rowi.style.width = 36/matrixSize*9;
+        rowi.style.height = 36/matrixSize*3
+        for(var l=1; l<=matrixSize; l++){
+            var cell = document.createElement("td");
+            var value = i+','+p+','+l;
+            cell.id=value;
+            cell.className="cell white";
+            cell.style.backgroundColor="white";
+            cell.style.border= "1px solid black";
+            rowi.appendChild(cell);
+        }
+    }
+    
+
+}
+
+var mouseIsDown = false;
+var color = 'rgb(17, 157, 255)'
+document.querySelectorAll('#matrix td')
+.forEach(e => e.addEventListener("mousedown", function() {
+    mouseIsDown = true}));
+
+document.querySelectorAll('#matrix td')
+.forEach(e => e.addEventListener("mouseup", function() {
+    mouseIsDown = false}));
+
+document.querySelectorAll('#matrix td')
+.forEach(e=> e.addEventListener("click", function(){
+    if (e.style.backgroundColor == 'white'){
+        color = 'rgb(17, 157, 255)';
+        e.style.backgroundColor = color;
+    }
+    else if(e.style.backgroundColor == 'rgb(17, 157, 255)'){
+        color = 'white';
+        e.style.backgroundColor = color;
+    }
+
+
+}));
+
+document.querySelectorAll('#matrix td')
+.forEach(e => e.addEventListener("mousemove", function() {
+   if(mouseIsDown){
+        e.style.backgroundColor=color
+   }
+}));
+
+
+    // Here, `this` refers to the element the event was hooked on
+
+
+
+for(var p=i; p<=10; p++){
+    var value = "mem"+p;
+    const mem2 = document.getElementById(value);
+    mem2.style.display="none";
+}
+
+const allMatrix = document.getElementById("matrix");
+if(number<=5){
+    var pxadd = 220*number;
+    allMatrix.style.width = pxadd+'px';
+}
+else{
+    var pxadd = 220*5;
+    allMatrix.style.width = pxadd+'px';
+}
+
+
+
+const plots = document.getElementById("allPlots");
+plots.style.visibility="hidden";
+
+let noise = document.getElementById("noiseadd");
+noise.style.display="block";
+
+let animate = document.getElementById("animate");
+animate.style.display="block";
+
+let submit = document.getElementById("finish");
+submit.style.display="block";
+
+let iteration = document.getElementById("slide");
+iteration.style.display="block";
+
+let startAni = document.getElementById("startAni");
+startAni.style.display="none";
+}
+for(var i=1; i<11; i++){
+    var plotnum = document.getElementById("plot"+i);
+   plotnum.innerText = '';
+}
+
+var plotnum = document.getElementById("aPlot");
+plotnum.innerText = '';
+
+var lyplot = document.getElementById("LyPlot");
+lyplot.innerText='';
+var firstplot2 = document.getElementById("firstplot2");
+firstplot2.style.display="none";
+
+}
+
+function reset(){
+    location.reload();
+}
+
+function animation(currentmatrix, count, lyapunov){
+    console.log("hello");
+    const matrixSize = document.getElementById("matrixSize").value;
+    var numofmatrix = (lyapunov.length)/(matrixSize*matrixSize+1);
+    var range1 = matrixSize+1;
+    let s = currentmatrix;
+    let m=0;
+    var xlyapunov = [];
+    var ylyapunov=[];
+    var start;
+    var num = JSON.parse(JSON.stringify(count));
+    if((count)%(matrixSize*matrixSize+1)==0){
+        start=count;
+        sessionStorage.setItem("start", start);
+    }
+    start=sessionStorage.getItem("start");
+    if(start==null){
+        start=0;
+    }
+    var ysmall = lyapunov[count];
+    var ylarge = lyapunov[start];
+
+    var p=0;
+    for(var i=start; i<count; i++){
+        ylyapunov.push(lyapunov[i]);
+        xlyapunov.push(p);
+        p++;
+    }
+
+    let matrixback = new Array(matrixSize);
+    for(let i=0; i<matrixSize; i++){
+        matrixback[i]=new Array(matrixSize).fill(0);
+    }
+
+    for(let i=0; i<matrixSize; i++){
+        for(let j=0; j<matrixSize; j++){
+            matrixback[i][j]=currentmatrix[m];
+            m++;
+        }
+    }
+
+
+for(var p=0; p<matrixSize; p++){
+    for (var l=0; l<matrixSize; l++){
+        var posp = p+1;
+        var posl = l+1;
+        if(matrixback[p][l]==-1|| matrixback[p][l]==0){
+
+            var cell = document.getElementById('0,3,'+posp+','+posl);
+            cell.style.backgroundColor = 'black';
+        }
+        else{
+            var cell = document.getElementById('0,3,'+posp+','+posl);
+            cell.style.backgroundColor = 'white';
+
+        }
+    }
+  }
+
+        let data1 = [{
+            x: xlyapunov,
+            y: ylyapunov,
+            type: "scatter",
+        }];
+        let layout1 = {
+            xaxis:{
+                range: [0, matrixSize*matrixSize]
+            },
+            yaxis: {
+                range: [ysmall, ylarge]
+            },
+            autosize: false,
+            width: 500,
+            height: 500,
+            title:"animation"
+        };
+    
+        let config1 = {
+            responsive:true,
+        };
+    
+        Plotly.newPlot('LyPlot', data1, layout1);
+}
+
+function contAnimate(){
+    var newone=true;
+    const matrixSize = document.getElementById("matrixSize").value;
+    const doublethat = matrixSize*matrixSize;
+    let countEl = document.getElementById("slide");
+    let animateCount =countEl.innerText;
+    if(animateCount>=document.getElementById("memorynum").value*doublethat){
+        animateCount=0;
+    }
+
+    var allmatrices = sessionStorage.getItem("Matrices");
+    var alllyapunov = sessionStorage.getItem("lyapunov");
+    var lyapunov = JSON.parse("[" + alllyapunov + "]");
+    var matrices = JSON.parse("[" + allmatrices + "]");
+    var start=animateCount*doublethat;
+    var end = start + doublethat;
+    var inputmatrices=[];
+    for(var i=start; i<end; i++){
+        inputmatrices.push(matrices[i]);
+    }
+    animation(inputmatrices, animateCount, lyapunov);
+    animateCount++;
+    countEl.innerText = animateCount;
+}
+
+function startit(){
+    let statement = document.getElementById("startIt");
+    const matrixSize = document.getElementById("matrixSize").value;
+    if(statement.innerText.toString()=="Start Animation"){
+        statement.innerText = "Pause Animation";
+        myInt = setInterval(function(){ document.getElementById("animateBtn").click(); }, (10-matrixSize)*30);
+    }
+    else{
+        statement.innerText = "Start Animation";
+        clearInterval(myInt);
+    }
+   
+}
+
+
+    
+
+
 
