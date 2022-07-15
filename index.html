@@ -24,17 +24,18 @@
 	</div>
 
 	<p id="ptop"> 
-	<label for="last10Trace"><b>Show Last 10 Traces</b></label> <input type="checkbox" id="last10Trace" /><br>
+	<label for="last10Trace"><b>Save Trace</b></label> <input type="checkbox" id="last10Trace" /><br>
 	<label for="lastTrace"><b>Show Last Trace</b></label> <input type="checkbox" id="lastTrace" /><br>
 	<label for="VC"><b>Voltage Clamp</b></label> <input type="checkbox" id="VC" /><br>
 	<label for="VC"><b>Two step Voltage Clamp</b></label> <input type="checkbox" id="VC2" /><br>
 	<label for="ttx"><b>Add TTX</b></label> <input type="checkbox" id="ttx" /><br>
 	<label for="tea"><b>Add TEA</b></label> <input type="checkbox" id="tea" /><br>
+	<label for="ref"><b>Refractory Period</b></label> <input type="checkbox" id="tea" /><br>
 	<label for="dendrite"><b>Stick Dendrite</b></label> <input type="checkbox" id="dendrite" />
 	</p>
 	
 	<p id="pbottom"> 
-	<strong id="text"> HH Model Settings 1: </strong> <br>
+	<strong id="text"> Current Clamp Settings 1: </strong> <br>
 	<label class="tooltip" for="tspan">Simulation Window (ms): 
 		<span class="tooltiptext">Time span of the simulation.</span> 
 	</label>
@@ -51,14 +52,14 @@
     <input type="number" id="duration" step="1" min="0" /> <br>
 	
 	
-	<label id="rvlabel" class="tooltip" for="rv"><i>u</i><sub>i</sub> (mV): 
+	<label id="rvlabel" class="tooltip" for="rv">Resting Potential (mV): 
 		<span class="tooltiptext">Initial membrane potential.</span> 
 	</label>
     <input type="number" id="rv" step="1" />
 	</p> 
 
 	<p id="pbottom2" class="shown"> 
-		<strong> HH Model Settings 2: </strong> <br>
+		<strong>Current Clamp Settings 2</strong> <br>
 	
 		<label id="iinputlabel" class="tooltip" for="iinput2"><i>I</i> (mA): 
 			<span class="tooltiptext">Input current.</span> 
@@ -71,7 +72,7 @@
 		<input type="number" id="duration2" step="1" min="0" /> <br>
 		
 		
-		<label id="rvlabel" class="tooltip" for="rv"><i>u</i><sub>i</sub> (mV): 
+		<label id="rvlabel" class="tooltip" for="rv">Resting Potential (mV): 
 			<span class="tooltiptext">Initial membrane potential.</span> 
 		</label>
 		<input type="number" id="rv2" step="1" /> <br>

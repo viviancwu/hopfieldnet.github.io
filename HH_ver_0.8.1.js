@@ -1533,7 +1533,7 @@ function blocker(event) {
 } 
 
 function buildQ(traceQ, trace) {
-	if (traceQ.length < 10) {
+	if (traceQ.length < 3) {
 		traceQ.push(trace); 
 	} else {
 		traceQ.shift(); 
@@ -1568,13 +1568,14 @@ function prepareVQ(queue) {
 		var formattedtrace = {
   		x: t,
   		y: queue[i],
+		hoverinfo:'skip',
   		type: 'scatter', 
   		mode: 'lines',
   		name: `V<sub>m</sub> No.${i+1}`, 
   		line: {
-    		color: `rgb(255, ${165+(queue.length-i-1)/10*(255-165)}, ${0+(queue.length-i-1)/10*(255-0)})`,
+    		color: '#33b5e5',//`rgb(255, ${165+(queue.length-i-1)/10*(255-165)}, ${0+(queue.length-i-1)/10*(255-0)})`,
     		width: 1.5,
-			dash: 'dot'
+			//dash: 'dot'
     		}
   		}; 
 
