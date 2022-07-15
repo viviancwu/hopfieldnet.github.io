@@ -509,7 +509,7 @@ function initialize() {
 	usergcoup.value = g_coupl;
 	userseg.value = nSegments;
 	useriinputd.value = synLoc;
-	usercurrentinj.value = 0.1;
+	usercurrentinj.value = 1;
 	userd_dend.value = d_dend;
 	userd_soma.value = d_soma;
 	userl_dend.value = l_dend;
@@ -776,6 +776,7 @@ else{
 			vLeft = V;
 		}
 		else{
+			//eval('vMem = vMembrane_'+j+';');
 			vLeft = vDend[j-1];
 		}
 		currLeft = g_coupl*1e-9/(A_seg*1e-6)*(vLeft[i]-vDendCurr[i]);
@@ -783,10 +784,12 @@ else{
 			currRight=0;
 		}
 		else{
+			//eval('vMem = vMembrane_'+(j+1).toString()+';');
 			vRight = vDend[j+1];
 			currRight = g_coupl*1e-9/(A_seg*1e-6)*(vRight[i]-vDendCurr[i]);
 		}
 		if(synLoc==j+1){
+			//vDendCurr.push(vDendCurr[i]+deltaT/(tauM_seg*1e-3)*(R_seg*1e6*(currLeft+currRight-currentinj)+E_leak*1e-3-vDendCurr[i]));
 			if(i-offset<loop1){
 			vDendCurr.push(vDendCurr[i]+dt*(1/C_M)*(currentinj-(currLeft+currRight)));
 			}
@@ -795,6 +798,7 @@ else{
 			}
 		}
 		else{
+			//vDendCurr.push(vDendCurr[i]+deltaT/(tauM_seg*1e-3)*(R_seg*1e6*(currLeft+currRight)+E_leak*1e-3-vDendCurr[i]));	
 			vDendCurr.push(vDendCurr[i]+dt*(1/C_M)*(currLeft+currRight));
 		}
 		vDend[j]=vDendCurr;
@@ -810,7 +814,7 @@ else{
 		
 		ina.push(gNa*Math.pow(m[i+1],3)*h[i+1]*(V[i+1]-eNa)); 
 		ik.push(gK*Math.pow(n[i+1],4)*(V[i+1]-eK)); 
-		il.push(gL*(V[i+1]-eL));
+		il.push(gL*(V[i+1]-eL)); 
 		itt.push(ina[i+1]+ik[i+1]+il[i+1]); 
 	}	
 }
