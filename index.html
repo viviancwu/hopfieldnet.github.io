@@ -1,116 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=>, initial-scale=1.0">
-    <title>Hopfield Network</title>
-    <link rel="stylesheet" href="hopfield.css" type="text/css"></link>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge"> 
+  <link rel="stylesheet" href="styles3.css">
+  <title>Hodgkin-Huxley Model</title>
+  <style> 
+	p {line-height: 2;}
+  </style>
 </head>
 <body>
-   <h1 id="heading">Hopfield Network Simulator</h1>
-<div id="final" style="min-width:260px">
-   <div id="regen">
-      <p id="regenerate"> 
-         <strong> Generate Matrices </strong> <br>
-         <label id="inputsize" class="tooltip" for="input">Matrix Size
-            <span class="tooltiptext">a number between 3-10</span> 
-         </label>
-         <input type="number" id="matrixSize"> <br>
-      
-         <label class="tooltip" for="memnum">Number of Memory: 
-            <span class="tooltiptext">number of memories</span> 
-         </label>
-         <input type="number" id="memorynum"><br>
-         <button type="submit" id="matrixsubmit" onclick="addMatrix()">Regenerate</button>
-         <span id="errormsg"></span>
-         
-         </p> 
 
-   
-      <!--<span id="regenerate">  Generate Matrices: input numbers from 3-10</span><br>
-      <input type="number" id="matrixSize" placeholder="Matrix Size">
-      <input type="number" id="memorynum" placeholder="Number of Memory"><br>
-      <button type="submit" id="matrixsubmit" onclick="addMatrix()">Regenerate</button>
-      <span id="errormsg"></span>-->
-   </div>
-   <div id="noiseadd">
-      <p id="regenerate"> 
-      
-         <label class="tooltip" id="addnoise">Noise Level: 
-            <span class="tooltiptext">amount of noise generated to the memory</span> 
-         </label>
-         <input type="number" id="noiselevel" placeholder="Noise Level"><br>
-         <label id="animate">Generate Animation:
-            <input type="checkbox" id="animation">
-         </label>     
-         </p> 
-   </div>
-   <!--<div id="animate">
-      <span>Generate Animation</span>
-      <input type="checkbox" id="animation">
-   </div>-->
-
-   <div id="finish">
-      <button type="submit" id="matrixsubmit" onclick="hopfield()">submit</button>
-      <button type="submit" id="reset-btn" onclick="reset()">reset</button>
-   </div>
-   <div id="slide">0</div>
+<div class="header">
+	<h1>Hodgkin-Huxley Squid Giant Axon Model</h1>
 </div>
-<div id="matrix">
-   <tr id="row1"><div id="mem1" class = "contain"></div>
-   <div id="mem2" class = "contain"></div>
-   <div id="mem3" class = "contain"></div>
-   <div id="mem4" class = "contain"></div>
-   <div id="mem5" class = "contain"></div></tr>
-    <tr id="row2"><div id="mem6" class = "contain"></div>
-    <div id="mem7" class = "contain"></div>
-    <div id="mem8" class = "contain"></div>
-    <div id="mem9" class = "contain"></div> 
-    <div id="mem10" class = "contain"></div></tr> 
+
+<div class="row">
+  <div class="col-3 col-s-9 col-d-6 col-h-3"> 
+  	
+  	<div class="center">
+	<input type="button" value="Reset Simulation" id="reset"> <br>
+	</div>
+
+	<p id="ptop"> 
+	<label for="last10Trace"><b>Show Last 10 Traces</b></label> <input type="checkbox" id="last10Trace" /><br>
+	<label for="lastTrace"><b>Show Last Trace</b></label> <input type="checkbox" id="lastTrace" /><br>
+	<label for="VC"><b>Voltage Clamp</b></label> <input type="checkbox" id="VC" /><br>
+	<label for="VC"><b>Two step Voltage Clamp</b></label> <input type="checkbox" id="VC2" /><br>
+	<label for="ttx"><b>Add TTX</b></label> <input type="checkbox" id="ttx" /><br>
+	<label for="tea"><b>Add TEA</b></label> <input type="checkbox" id="tea" /><br>
+	<label for="dendrite"><b>Stick Dendrite</b></label> <input type="checkbox" id="dendrite" />
+	</p>
+	
+	<p id="pbottom"> 
+	<strong id="text"> HH Model Settings 1: </strong> <br>
+	<label class="tooltip" for="tspan">Simulation Window (ms): 
+		<span class="tooltiptext">Time span of the simulation.</span> 
+	</label>
+    <input type="number" id="tspan" step="1" min="0" /> <br> 
+
+	<label id="iinputlabel" class="tooltip" for="iinput"><i>I</i> (mA): 
+		<span class="tooltiptext">Input current.</span> 
+	</label>
+    <input type="number" id="iinput" step="0.01" /> <br>
+
+    <label class="tooltip" for="duration">Duration (ms): 
+		<span class="tooltiptext">Duration of input current.</span> 
+	</label>
+    <input type="number" id="duration" step="1" min="0" /> <br>
+	
+	
+	<label id="rvlabel" class="tooltip" for="rv"><i>u</i><sub>i</sub> (mV): 
+		<span class="tooltiptext">Initial membrane potential.</span> 
+	</label>
+    <input type="number" id="rv" step="1" />
+	</p> 
+
+	<p id="pbottom2" class="shown"> 
+		<strong> HH Model Settings 2: </strong> <br>
+	
+		<label id="iinputlabel" class="tooltip" for="iinput2"><i>I</i> (mA): 
+			<span class="tooltiptext">Input current.</span> 
+		</label>
+		<input type="number" id="iinput2" step="0.01" /> <br>
+	
+		<label class="tooltip" for="duration2">Duration (ms): 
+			<span class="tooltiptext">Duration of input current.</span> 
+		</label>
+		<input type="number" id="duration2" step="1" min="0" /> <br>
+		
+		
+		<label id="rvlabel" class="tooltip" for="rv"><i>u</i><sub>i</sub> (mV): 
+			<span class="tooltiptext">Initial membrane potential.</span> 
+		</label>
+		<input type="number" id="rv2" step="1" /> <br>
+
+		<label class="tooltip" for="tspan">Interval between steps 
+			<span class="tooltiptext">Time span between HH steps.</span> 
+		</label>
+		<input type="number" id="durationHH" step="1" min="0" /> 
+		</p> 
+
+
+	
+	
+	<p id="ParaPanel" class="hidden"> 
+	<label for="custompara"><b>Customize gating variables</b></label> <input type="checkbox" id="custompara" /><br>
+    <label class="tooltip" for="mi" style="color:rgb(55, 128, 191);"><i>m</i><sub>i</sub>: 
+		<span class="tooltiptext">Initial value of gating variable <i>m</i>.</span> 
+	</label>
+    <input type="number" id="mi" step="0.1" min="0" max="1" disabled="true" /> <br> 
+	<input type="range" id="mRange" step="0.1" min="0" max="1" class="slider" disabled="true"> <br>
+	
+    <label class="tooltip" for="hi" style="color:rgb(255, 165, 0);"><i>h</i><sub>i</sub>: 
+		<span class="tooltiptext">Initial value of gating variable <i>h</i>.</span> 
+	</label>
+    <input type="number" id="hi" step="0.1" min="0" max="1" disabled="true" /> <br> 
+	<input type="range" id="hRange" step="0.1" min="0" max="1" class="slider" disabled="true"> <br>
+	
+	<label class="tooltip" for="ni" style="color:rgb(124, 252, 0);"><i>n</i><sub>i</sub>: 
+		<span class="tooltiptext">Initial value of gating variable <i>n</i>.</span> 
+	</label>
+    <input type="number" id="ni" step="0.1" min="0" max="1" disabled="true" /> <br> 
+	<input type="range" id="nRange" step="0.1" min="0" max="1" class="slider" disabled="true">
+	</p>
+
+	<p id="VCPanel" class="hidden"> <strong> V-Clamp settings: </strong> <br>
+	<label class="tooltip" for="mean">Command voltage (mV): 
+		<span class="tooltiptext">The first voltage at which the cell is clamped.</span> 
+	</label>
+    <input type="number" id="clampV" step="5" /><br>
+    <label class="tooltip" for="restV">V<sub>i</sub> (mV): 
+		<span class="tooltiptext">Holding voltage before command voltage step is applied.</span> 
+	</label>
+    <input type="number" id="restV" step="1" /><br> 
+	</p> 
+
+	<p id="VC2Panel" class="hidden"> 
+		<strong> Two step voltage clamp: </strong> <br>
+		<label class="tooltip" for="clamptime">Time between (mS): 
+			<span class="tooltiptext">Time between voltage applications.</span> 
+		</label>
+		<input type="number" id="clampVtime" step="1" min="0" /> <br> 
+		</p> 
+
+	<p id="DPanel" class="hidden"> 
+		<strong id="text"> Stick Dendrite Settings </strong> <br>
+		<label class="tooltip" for="seg"># of Segments
+			<span class="tooltiptext">Number of dendritic segments (0-10) </span>
+		</label>
+		<input type="number" id="seg" step="1" min="0" /> <br> 
+		
+		<label id="iinputlabel" class="tooltip" for="iinputd">Location 
+			<span class="tooltiptext">Location of current inj</span> 
+		</label>
+		<input type="number" id="iinputd" step="0.01" /> <br>
+		<label id="rvlabel" class="tooltip" for="gcoup">g coupling 
+			<span class="tooltiptext">Dendritic conductance (max: 2000)</span> 
+		</label>
+		<input type="number" id="gcoup" step="1" /><br>
+		<label id="currin" class="tooltip" for="currinj">currnt injected (mA)
+			<span class="tooltiptext">current at synapse</span> 
+		</label>
+		<input type="number" id="currentinj" step="1" /><br>
+		<label id="dur" class="tooltip" for="dura">Duration (ms)
+			<span class="tooltiptext">Duration of injection</span> 
+		</label>
+		<input type="number" id="durationD" step="1" /><br>
+		<label id="somad" class="tooltip" for="d_soma">Soma Diameter (uM)
+			<span class="tooltiptext">Diameter of the soma in nm</span> 
+		</label>
+		<input type="number" id="d_soma" step="1" /><br>
+		<label id="dendd" class="tooltip" for="d_dend">Dendrite Diameter (uM)
+			<span class="tooltiptext">Diameter of the dendrite in nm</span> 
+		</label>
+		<input type="number" id="d_dend" step="1" /><br>
+		<label id="dendl" class="tooltip" for="l_dend">Dendrite length (uM)
+			<span class="tooltiptext">length of the dendrite in nm</span> 
+		</label>
+		<input type="number" id="l_dend" step="1" /><br><br>
+		</p> 
+		
+  </div>
+  
+  <div class="col-9 col-s-12 col-d-12 col-h-9">
+  	<div class="wrapper">
+    	<div id="myDiv1" class="plots"></div>
+		<div id="myDiv2" class="plots"></div> 
+		<!-- <div id="myDiv3" class="plots"></div> -->
+		<div id="myDiv4" class="plots"></div>
+	</div>
+  </div>
+  
 </div>
-    <table id="allPlots">
-      <div id="startAni" style="max-height:40px">
-         <button type="submit" id="startIt" onclick="startit()">Start Animation</button>
-         <button type="submit" id="animateBtn" onclick="contAnimate()">animate</button>
-      </div>
-       <tr class="plotani" id="plot0"> 
-          <td id="firstplot"><div id='aPlot' class="plot" style="max-width:50-px"></div></td>
-          <td id="firstplot2" ><div id='LyPlot' class="plots" style="min-width:250-px"> </div></td>
-       </tr>
-       <tr class="plot" id="plot1">
-    </tr>
-    <tr class="plot" id="plot2">
- </tr>
- <tr class="plot" id="plot3">
-</tr>
-<tr class="plot"  id="plot4">
-</tr>
-<tr class="plot" id="plot5">
-</tr>
-<tr class="plot" id="plot6">
-</tr>
-<tr class="plot" id="plot7">
-</tr>
-<tr class="plot" id="plot8">
-</tr>
-<tr class="plot" id="plot9">
-</tr>
-<tr class="plot" id="plot10">
 
-   
-</tr>
-   </table>
+<div class="footer">
+	Hodgkin-Huxley Model Ver. 0.8.1
+</div>
 
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="./HH_ver_0.8.1.js"></script>
+  
 
-
-<footer class="footer">
-   Hopfield Simulations V1.2
-</footer>
-
-<script src = "hopfield.js"></script>
-<script src='https://cdn.plot.ly/plotly-2.9.0.min.js'></script>
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-<script type="text/javascript" src="Project_Javascript_jQuery.js"></script>
 </body>
 </html>

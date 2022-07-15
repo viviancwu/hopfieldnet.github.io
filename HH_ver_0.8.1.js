@@ -173,7 +173,7 @@ var restv = -60;
 //dendrite set up
 
 var nSegments=1;
-var g_coupl=20000; //ns
+var g_coupl=2000; //ns
 var synLoc=0;
 var d_soma=20; //um
 var d_dend=1; //um 
@@ -187,6 +187,7 @@ var A_seg = 2*Math.PI*(d_dend/2)*l_seg;
 var R_seg = d_dend*l_dend/(2*d_soma*nSegments)*R_input;
 var tauM_seg = R_seg*1e6*C_M*1e-12*1e3;
 var l_seg = l_dend/nSegments;
+var durationD = 1;
 var vDend = [];
 
 //set up soma
@@ -238,12 +239,6 @@ for(var i=0; i<10; i++){
 	vDend.push(vMem);
 }
 
-
-
-
-
-
-
 var userlast10Flag = document.getElementById("last10Trace"); 
 var userlastFlag = document.getElementById("lastTrace");
 var userVCFlag = document.getElementById("VC"); 
@@ -284,6 +279,7 @@ var userseg = document.getElementById("seg");
 var useriinputd = document.getElementById("iinputd");
 var usergcoup = document.getElementById("gcoup");
 var usercurrentinj = document.getElementById("currentinj");
+var userdurationD = document.getElementById("durationD");
 var userd_soma = document.getElementById("d_soma");
 var userd_dend = document.getElementById("d_dend");
 var userl_dend = document.getElementById("l_dend");
@@ -328,6 +324,7 @@ document.getElementById("seg").addEventListener("change", submit);
 document.getElementById("iinputd").addEventListener("change", submit);
 document.getElementById("gcoup").addEventListener("change", submit);
 document.getElementById("currentinj").addEventListener("change", submit);
+document.getElementById("durationD").addEventListener("change",submit);
 document.getElementById("d_dend").addEventListener("change", submit);
 document.getElementById("l_dend").addEventListener("change", submit);
 document.getElementById("d_soma").addEventListener("change", submit);
@@ -359,7 +356,7 @@ function VCcheck(event) {
 		document.getElementById("rvlabel").style.display = 'none';
 
 		//usercurd.value = 25; 
-		usercurd.value = 1; 
+		usercurd.value = 3; 
 		var words = document.getElementById("text");
 		words.innerHTML = "HH Model";
 		VCsubmit(event); 
@@ -403,7 +400,7 @@ function VCcheck(event) {
 		userHHpanel2.classList.add("hidden");
 		userHHpanel2.classList.remove("shown");
 		//usercurd.value = 25; 
-		usercurd.value = 1; 
+		usercurd.value = 3; 
 		var words = document.getElementById("text");
 		words.innerHTML = "HH Model";
 		VCsubmit(event); 
@@ -449,7 +446,7 @@ function VCcheck(event) {
 		userHHpanel2.classList.add("hidden");
 		userHHpanel2.classList.remove("shown");
 		//usercurd.value = 25; 
-		usercurd.value = 1; 
+		usercurd.value = 3; 
 		var words = document.getElementById("text");
 		words.innerHTML = "HH Model";
 		VCsubmit(event); 
@@ -509,7 +506,8 @@ function initialize() {
 	usergcoup.value = g_coupl;
 	userseg.value = nSegments;
 	useriinputd.value = synLoc;
-	usercurrentinj.value = 1;
+	usercurrentinj.value = 0.1;
+	userdurationD.value=durationD;
 	userd_dend.value = d_dend;
 	userd_soma.value = d_soma;
 	userl_dend.value = l_dend;
@@ -567,12 +565,16 @@ function submit(event) {
 		userDpanel.classList.remove("hidden");
 		userHHpanel2.classList.add("hidden");
 		userHHpanel2.classList.remove("shown");
+		userHHpanel1.classList.add("hidden");
+		userHHpanel2.classList.remove("shown");
 	}
 	else{		
 		userDpanel.classList.remove("shown");
 		userDpanel.classList.add("hidden");
 		userHHpanel2.classList.remove("hidden");
 		userHHpanel2.classList.add("shown");
+		userHHpanel1.classList.remove("hidden");
+		userHHpanel1.classList.add("shown");
 
 	}
   	oldV = V.slice(); 
@@ -598,6 +600,7 @@ function submit(event) {
 	synLoc = parseFloat(useriinputd.value);
 	g_coupl = parseFloat(usergcoup.value);
 	currentinj = parseFloat(usercurrentinj.value);
+	durationD = parseFloat(userdurationD.value);
 	d_soma = parseFloat(userd_soma.value);
 	l_dend = parseFloat(userl_dend.value);
 	d_dend = parseFloat(userd_dend.value);
@@ -648,6 +651,9 @@ function buildHH() {
 }
 
 function hhrun() {
+	if(userDendrite.checked){
+		curd=durationD;
+	}
 	var loop = Math.ceil(tspan/dt);   // no. of iterations of euler 
 	var loop1 = Math.ceil(curd/dt);
 	var loop2;
@@ -689,6 +695,7 @@ function hhrun() {
 	ik.push(gK*Math.pow(n[0],4)*(V[0]-eK)); 
 	il.push(gL*(V[0]-eL)); 
 	itt.push(ina[0]+ik[0]+il[0]); 
+
 
 	for (var i = 1; i < offset+1; i++) {
 		t.push(i*dt); 
@@ -757,6 +764,7 @@ function hhrun() {
 			}
 			if(synLoc==j+1){
 				vDendCurr.push(vDendCurr[i]+dt*(1/C_M)*(I));
+				curinjt.push(tspan*(i)/loop); 
 
 			}
 			else{
@@ -776,7 +784,6 @@ else{
 			vLeft = V;
 		}
 		else{
-			//eval('vMem = vMembrane_'+j+';');
 			vLeft = vDend[j-1];
 		}
 		currLeft = g_coupl*1e-9/(A_seg*1e-6)*(vLeft[i]-vDendCurr[i]);
@@ -784,21 +791,20 @@ else{
 			currRight=0;
 		}
 		else{
-			//eval('vMem = vMembrane_'+(j+1).toString()+';');
 			vRight = vDend[j+1];
 			currRight = g_coupl*1e-9/(A_seg*1e-6)*(vRight[i]-vDendCurr[i]);
 		}
 		if(synLoc==j+1){
-			//vDendCurr.push(vDendCurr[i]+deltaT/(tauM_seg*1e-3)*(R_seg*1e6*(currLeft+currRight-currentinj)+E_leak*1e-3-vDendCurr[i]));
 			if(i-offset<loop1){
 			vDendCurr.push(vDendCurr[i]+dt*(1/C_M)*(currentinj-(currLeft+currRight)));
+			curinjt.push(tspan*(i)/loop); 
+			curinj.push(currentinj); 
 			}
 			else{
 				vDendCurr.push(vDendCurr[i]+dt*(1/C_M)*(currLeft+currRight));
 			}
 		}
 		else{
-			//vDendCurr.push(vDendCurr[i]+deltaT/(tauM_seg*1e-3)*(R_seg*1e6*(currLeft+currRight)+E_leak*1e-3-vDendCurr[i]));	
 			vDendCurr.push(vDendCurr[i]+dt*(1/C_M)*(currLeft+currRight));
 		}
 		vDend[j]=vDendCurr;
@@ -814,7 +820,7 @@ else{
 		
 		ina.push(gNa*Math.pow(m[i+1],3)*h[i+1]*(V[i+1]-eNa)); 
 		ik.push(gK*Math.pow(n[i+1],4)*(V[i+1]-eK)); 
-		il.push(gL*(V[i+1]-eL)); 
+		il.push(gL*(V[i+1]-eL));
 		itt.push(ina[i+1]+ik[i+1]+il[i+1]); 
 	}	
 }
@@ -827,114 +833,7 @@ for (var i = 0; i < ina.length; i++) {
 }
 
 
-/*else{
-	for(var i=0; i<ite-1; i++){
-		t.push(i*dt);
-	for(var j=0; j<nSegments; j++){
-		vDendCurr = vDend[j];
-		if(j==0){
-			vLeft = vMembrane;
-		}
-		else{
-			//eval('vMem = vMembrane_'+j+';');
-			vLeft = vDend[j-1];
-		}
-		currLeft = g_coupl*1e-9/A_seg*(vLeft[i]-vDendCurr[i]);
-		if(j==nSegments-1){
-			currRight=0;
-		}
-		else{
-			//eval('vMem = vMembrane_'+(j+1).toString()+';');
-			vRight = vDend[j+1];
-			currRight = g_coupl*1e-9/A_seg*(vRight[i]-vDendCurr[i]);
-		}
-		if(synLoc==j+1){
-			vDendCurr.push(vDendCurr[i]+deltaT/(tauM_seg*1e-3)*(R_seg*1e6*(currLeft+currRight-currentinj)+E_leak*1e-3-vDendCurr[i]));
-		}
-		else{
-			vDendCurr.push(vDendCurr[i]+deltaT/(tauM_seg*1e-3)*(R_seg*1e6*(currLeft+currRight)+E_leak*1e-3-vDendCurr[i]));	
-		}
-		vDend[j]=vDendCurr;
-	}
-	if(spikingNow){
-		vMembrane.push(AP_reset*1e-3);
-		spikingNow=false;
-	}
-	else{
-		if(synLoc>0){
-			vRight=vMembrane_1;
-			currRight = g_coupl*1e-9/A_soma*(vRight[i]-vMembrane[i]);
-			vMembrane.push(vMembrane[i]+deltaT/(tauM*1e-3)*(R_input*1e6*(+currRight)+E_leak*1e-3-vMembrane[i]));
-		}
-		else if(synLoc==0){
-			vRight = vMembrane_1;
-			currRight = g_coupl*1e-9/A_soma*(vRight[i]-vMembrane[i]);
-			vMembrane.push(vMembrane[i]+deltaT/(tauM*1e-3)*(R_input*1e6*(-currentinj+currRight)+E_leak*1e-3-vMembrane[i]));
-		}
-		else if(nSegments==0){
-			vMembrane.push(vMembrane[i]+deltaT/(tauM*1e-3)*(R_input*1e6*(-currentinj)+E_leak*1e-3-vMembrane[i]));
-		}
-		if(vMembrane[i+1]>AP_threshold*1e-3){
-			vMembrane.push(AP_max*1e-3);
-			spikingNow=true;
-		}
-	}
-}*/
 }
-
-/*function drun(){
-	var l_seg = l_dend/nSegments;
-	var A_soma = 4*Math.PI*(d_soma/2)^2;
-	var A_seg = 2*Math.PI*(d_dend/2)*l_seg;
-	var R_seg = d_dend*l_dend/(2*d_soma*nSegments)*R_input;
-	var tauM_seg = R_seg*1e6*C_M*1e-12*1e3;
-	var i=0; 
-	var vDend=[];
-	vMembrane.push*(E_leak*1e-3);
-	vDend.push(vMembrane[0]);
-	for(var i=0; i<nSegments; i++){
-		var p = (i+1).toString();
-		eval("var vMembrane_"+p+";");
-		var membrane;
-		eval("membrane = vMembrane"+p+";");
-		vDend = membrane;
-	}
-
-	var currLeft;
-	var currRight;
-	var vLeft=[];
-	var vRight=[];
-	for(var i=0; i<n-1; i++){
-	for(var j=0; j<nSegments; j++){
-		var p = (j+1).toString();
-		var k = (j+2).toString();
-		eval("vDend = vMembrane_"+p+";");
-		if(j==0){
-			vLeft.push(vMembrane);
-		}
-		else{
-			eval("vMem = vMembrane_"+j+";");
-			vLeft.push(vMem);
-		}
-		currLeft = g_coupl*1e-9/A_seg*(vLeft[i]-vDend[i]);
-
-		if(j==nSegments-1){
-			currRight=0;
-		}
-		else{
-			eval("vMem2= vMembrane_"+k+";");
-			vRight.push(vMem2);
-			currRight = g_coupl*1e-9/A_seg*(vRight[i]-vDend[i]);
-		}
-		if(synLoc=j+1){
-			vDend[i+1]=vDend[i]+deltaT/(tauM_seg*1e-3)*(R_seg*1e6*(currLeft+currRight-totalCurr2)+E_leak*1e-3-vDend[i]);
-		}
-		else{
-			vDend[i+1] = vDend[i]+deltaT/(tauM_seg*1e-3)*(R_seg*1e6*(+currLeft+currRight)+E_leak*1e-3-vDend[i])
-		}
-	}
-}
-}*/
 
 
 function draw() {
@@ -1256,7 +1155,7 @@ function buildVC() {
 	fina = []; 
 	curinj = []; 
 	curinjt = []; 
-	itt = []; 
+	itt = [];
 
 	vcrun(); 
 }
@@ -1298,7 +1197,7 @@ function vcrun() {
 
 	for (var i = 1; i < vcoffset; i++) {
 		t.push((i-vcoffset)*dt); 
-		V.push(restv); 
+		V.push(restv);
 		m.push(m[i-1] + dt*(alphaM(V[i-1])*(1-m[i-1]) - betaM(V[i-1])*m[i-1])); 
 		h.push(h[i-1] + dt*(alphaH(V[i-1])*(1-h[i-1]) - betaH(V[i-1])*h[i-1])); 
 		n.push(n[i-1] + dt*(alphaN(V[i-1])*(1-n[i-1]) - betaN(V[i-1])*n[i-1])); 
@@ -1313,7 +1212,7 @@ function vcrun() {
 
 		if(VC2.checked){
 			if (i < loop1) {
-				V.push(-10);
+				V.push(clampv);
 			} else if (i>=loop1 && i<loop2){
 				V.push(restv); 
 			}
@@ -1321,7 +1220,7 @@ function vcrun() {
 				V.push(restv);
 			}
 			else if(i=>loop2 && i<=loop3){
-				V.push(-10); 
+				V.push(clampv); 
 			}
 		}
 		else if(!VC2.checked){
@@ -1581,6 +1480,13 @@ function foolProve() {
 	if (userrestV.value == -50) {userrestV.value = -49.999;}
 	if (userclampV.value == -35) {userclampV.value = -34.999;}
 	if (userclampV.value == -50) {userclampV.value = -49.999;}
+	if(usercurd.value==0.1){usercurd.value=0.11;}
+	if(usergcoup.value>2000){usergcoup.value=2000;}
+	if(userseg.value<useriinputd.value){useriinputd.value=userseg.value};
+	if(useriinputd.value==10 && userseg.value!=10){useriinputd.value=userseg.value};
+
+
+	
 } 
 
 function checkMode(event) {
