@@ -347,7 +347,7 @@ document.getElementById("d_soma").addEventListener("change", submit);
 function VCcheck(event) {
 	event.preventDefault(); 
 
-	if (userVCFlag.checked && !userVC2Flag.checked) {
+	if (userVCFlag.checked && !userVC2Flag.checked){
 		VC = 1; 
 		userVCpanel.classList.remove("hidden"); 
 		userVCpanel.classList.add("shown"); 
@@ -376,6 +376,17 @@ function VCcheck(event) {
 		words.innerHTML = "Voltage Clamp";
 		document.getElementById("pbottom").style.maxHeight='140px';
 		document.getElementById("ptop").style.maxHeight = "220px";
+		useriinput2.disabled=true;
+		userdurationHH.disabled=true;
+		useriinput2.classList.remove("shown");
+		useriinput2.classList.add("hidden");
+		userdurationHH.classList.remove("shown");
+		userdurationHH.classList.add("hidden");
+		var iinputlabel = document.getElementById("iinputlabel");
+		iinputlabel.innerText= "I (mA)";
+		document.getElementById("iinput2label").style.display = 'none';
+		document.getElementById("durationHHlabel").style.display = 'none';
+
 		VCsubmit(event); 
 	} else if (!userVCFlag.checked && !userVC2Flag.checked){
 		VC = 0; 
@@ -406,6 +417,7 @@ function VCcheck(event) {
 		document.getElementById("dendLabel").style.display='inline';
 		document.getElementById("ptop").style.maxHeight = "334px";
 		usercurd.value=3;
+		
 		submit(event); 
 	}
 	else if(userVC2Flag.checked && !userVCFlag.checked){
@@ -437,6 +449,16 @@ function VCcheck(event) {
 		document.getElementById("refLabel").style.display='none';
 		document.getElementById("dendLabel").style.display='none';
 		document.getElementById("ptop").style.maxHeight = "220px";
+		useriinput2.disabled=true;
+		userdurationHH.disabled=true;
+		useriinput2.classList.remove("shown");
+		useriinput2.classList.add("hidden");
+		userdurationHH.classList.remove("shown");
+		userdurationHH.classList.add("hidden");
+		var iinputlabel = document.getElementById("iinputlabel");
+		iinputlabel.innerText= "I (mA)";
+		document.getElementById("iinput2label").style.display = 'none';
+		document.getElementById("durationHHlabel").style.display = 'none';
 		VCsubmit(event); 
 	}
 	else if(!userVC2Flag.checked){
@@ -502,6 +524,16 @@ function VCcheck(event) {
 		document.getElementById("refLabel").style.display='none';
 		document.getElementById("dendLabel").style.display='none';
 		document.getElementById("ptop").style.maxHeight = "220px";
+		useriinput2.disabled=true;
+		userdurationHH.disabled=true;
+		useriinput2.classList.remove("shown");
+		useriinput2.classList.add("hidden");
+		userdurationHH.classList.remove("shown");
+		userdurationHH.classList.add("hidden");
+		var iinputlabel = document.getElementById("iinputlabel");
+		iinputlabel.innerText= "I (mA)";
+		document.getElementById("iinput2label").style.display = 'none';
+		document.getElementById("durationHHlabel").style.display = 'none';
 
 		VCsubmit(event); 
 
