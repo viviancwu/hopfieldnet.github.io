@@ -247,12 +247,14 @@ var VC2 = userVC2Flag;
 var userTTX = document.getElementById("ttx"); 
 var userTEA = document.getElementById("tea"); 
 var userDendrite = document.getElementById("dendrite");
+var userRef = document.getElementById("ref");
 
 var userVCpanel = document.getElementById("VCPanel"); 
 var userVC2panel = document.getElementById("VC2Panel");
 var userclampV = document.getElementById("clampV"); 
 var userclamptime = document.getElementById("clampVtime");
 var userrestV = document.getElementById("restV"); 
+//var userRefPanel = document.getElementById("refPanel");
 
 var userParapanel = document.getElementById("ParaPanel"); 
 var usercustomFlag = document.getElementById("custompara"); 
@@ -264,15 +266,23 @@ var userni = document.getElementById("ni");
 var usernRange = document.getElementById("nRange"); 
 
 var userHHpanel1 = document.getElementById("pbottom");
-var userHHpanel2 = document.getElementById("pbottom2");
+//var userHHpanel2 = document.getElementById("pbottom2");
 var usertspan = document.getElementById("tspan"); 
 var useriinput = document.getElementById("iinput"); 
 var usercurd = document.getElementById("duration"); 
 var userrv = document.getElementById("rv");
 var useriinput2 = document.getElementById("iinput2"); 
-var usercurd2 = document.getElementById("duration2"); 
-var userrv2 = document.getElementById("rv2");
+//var usercurd2 = document.getElementById("duration2"); 
+//var userrv2 = document.getElementById("rv2");
 var userdurationHH = document.getElementById("durationHH");
+useriinput2.disabled=true;
+userdurationHH.disabled=true;
+useriinput2.classList.remove("shown");
+useriinput2.classList.add("hidden");
+userdurationHH.classList.remove("shown");
+userdurationHH.classList.add("hidden");
+document.getElementById("iinput2label").style.display = 'none';
+document.getElementById("durationHHlabel").style.display = 'none';
 
 var userDpanel = document.getElementById("DPanel");
 var userseg = document.getElementById("seg");
@@ -290,6 +300,7 @@ document.getElementById("last10Trace").addEventListener("change", checkMode10);
 document.getElementById("lastTrace").addEventListener("change", checkMode); 
 document.getElementById("VC").addEventListener("change", VCcheck); 
 document.getElementById("VC2").addEventListener("change", VCcheck);
+document.getElementById("ref").addEventListener("change", submit);
 document.getElementById("dendrite").addEventListener("change", submit);
 document.getElementById("ttx").addEventListener("change", blocker); 
 document.getElementById("tea").addEventListener("change", blocker); 
@@ -316,8 +327,8 @@ else{
 }
 document.getElementById("rv").addEventListener("change", submit); 
 document.getElementById("iinput2").addEventListener("change", submit); 
-document.getElementById("duration2").addEventListener("change", submit); 
-document.getElementById("rv2").addEventListener("change", submit);  
+//document.getElementById("duration2").addEventListener("change", submit); 
+//document.getElementById("rv2").addEventListener("change", submit);  
 document.getElementById("durationHH").addEventListener("change", submit); 
 
 document.getElementById("seg").addEventListener("change", submit);
@@ -342,12 +353,12 @@ function VCcheck(event) {
 		userVCpanel.classList.add("shown"); 
 		userVC2panel.classList.add("hidden");
 		userVC2panel.classList.remove("shown");
-		userHHpanel2.classList.add("hidden");
-		userHHpanel2.classList.remove("shown");
+		//userHHpanel2.classList.add("hidden");
+		//userHHpanel2.classList.remove("shown");
 		useriinput.disabled = true; 
 		userrv.disabled = true; 
-		// userParapanel.classList.remove("shown"); 
-		// userParapanel.classList.add("hidden"); 
+		userParapanel.classList.remove("shown"); 
+		userParapanel.classList.add("hidden"); 
 		useriinput.classList.remove("shown"); 
 		useriinput.classList.add("hidden"); 
 		document.getElementById("iinputlabel").style.display = 'none';
@@ -356,9 +367,9 @@ function VCcheck(event) {
 		document.getElementById("rvlabel").style.display = 'none';
 
 		//usercurd.value = 25; 
-		usercurd.value = 3; 
+		usercurd.value = 25; 
 		var words = document.getElementById("text");
-		words.innerHTML = "HH Model";
+		words.innerHTML = "Voltage Clamp";
 		VCsubmit(event); 
 	} else if (!userVCFlag.checked && !userVC2Flag.checked){
 		VC = 0; 
@@ -366,8 +377,8 @@ function VCcheck(event) {
 		userVCpanel.classList.add("hidden"); 
 		userVC2panel.classList.add("hidden");
 		userVC2panel.classList.remove("shown");
-		userHHpanel2.classList.add("shown");
-		userHHpanel2.classList.remove("hidden");
+		//userHHpanel2.classList.add("shown");
+		//userHHpanel2.classList.remove("hidden");
 		useriinput.disabled = false; 
 		userrv.disabled = false; 
 		// userParapanel.classList.remove("hidden"); 
@@ -379,7 +390,7 @@ function VCcheck(event) {
 		userrv.classList.add("shown"); 
 		document.getElementById("rvlabel").style.display = 'inline';
 		var words = document.getElementById("text");
-		words.innerHTML = "HH Model settings 1";
+		words.innerHTML = "Current Clamp";
 		submit(event); 
 	}
 	else if(userVC2Flag.checked && !userVCFlag.checked){
@@ -397,12 +408,12 @@ function VCcheck(event) {
 		userrv.classList.remove("shown"); 
 		userrv.classList.add("hidden"); 
 		document.getElementById("rvlabel").style.display = 'none';
-		userHHpanel2.classList.add("hidden");
-		userHHpanel2.classList.remove("shown");
+		//userHHpanel2.classList.add("hidden");
+		//userHHpanel2.classList.remove("shown");
 		//usercurd.value = 25; 
 		usercurd.value = 3; 
 		var words = document.getElementById("text");
-		words.innerHTML = "HH Model";
+		words.innerHTML = "Voltage Clamp";
 		VCsubmit(event); 
 	}
 	else if(!userVC2Flag.checked){
@@ -410,8 +421,8 @@ function VCcheck(event) {
 		userVC2panel.classList.add("hidden");
 		userVCpanel.classList.remove("shown"); 
 		userVCpanel.classList.add("hidden"); 
-		userHHpanel2.classList.add("shown");
-		userHHpanel2.classList.remove("hidden");
+		//userHHpanel2.classList.add("shown");
+		//userHHpanel2.classList.remove("hidden");
 		useriinput.disabled = false; 
 		userrv.disabled = false; 
 		// userParapanel.classList.remove("hidden"); 
@@ -425,7 +436,7 @@ function VCcheck(event) {
 		document.getElementById("pbottom2").classList.add("shown");
 		document.getElementById("pbottom2").classList.remove("hidden");
 		var words = document.getElementById("text");
-		words.innerHTML = "HH Model settings 1";
+		words.innerHTML = "Current Clamp";
 		submit(event); 
 	}
 	else if(userVC2Flag.checked){
@@ -443,12 +454,12 @@ function VCcheck(event) {
 		userrv.classList.remove("shown"); 
 		userrv.classList.add("hidden"); 
 		document.getElementById("rvlabel").style.display = 'none';
-		userHHpanel2.classList.add("hidden");
-		userHHpanel2.classList.remove("shown");
+		//userHHpanel2.classList.add("hidden");
+		//userHHpanel2.classList.remove("shown");
 		//usercurd.value = 25; 
 		usercurd.value = 3; 
 		var words = document.getElementById("text");
-		words.innerHTML = "HH Model";
+		words.innerHTML = "Voltage Clamp";
 		VCsubmit(event); 
 
 	}
@@ -494,11 +505,11 @@ function initialize() {
 	usernRange.value = ni; 
 	usertspan.value = tspan; 
 	useriinput.value = I; 
-	useriinput2.value = 0;
+	useriinput2.value = 0.1;
 	usercurd.value = curd; 
-	usercurd2.value = 0;
+	//usercurd2.value = 0;
 	userrv.value = v; 
-	userrv2.value = v;
+	//userrv2.value = v;
 	userclampV.value = clampv; 
 	userclamptime.value=clamptime;
 	userrestV.value = restv;
@@ -563,19 +574,41 @@ function submit(event) {
 	if(userDendrite.checked){
 		userDpanel.classList.add("shown");
 		userDpanel.classList.remove("hidden");
-		userHHpanel2.classList.add("hidden");
-		userHHpanel2.classList.remove("shown");
 		userHHpanel1.classList.add("hidden");
-		userHHpanel2.classList.remove("shown");
+		userHHpanel1.classList.remove("shown");
 	}
 	else{		
 		userDpanel.classList.remove("shown");
 		userDpanel.classList.add("hidden");
-		userHHpanel2.classList.remove("hidden");
-		userHHpanel2.classList.add("shown");
 		userHHpanel1.classList.remove("hidden");
 		userHHpanel1.classList.add("shown");
 
+	}
+	if(userRef.checked){
+		useriinput2.disabled=false;
+		userdurationHH.disabled=false;
+		useriinput2.classList.add("shown");
+		useriinput2.classList.remove("hidden");
+		userdurationHH.classList.add("shown");
+		userdurationHH.classList.remove("hidden");
+		var iinputlabel = document.getElementById("iinputlabel");
+		iinputlabel.innerText="Stim 1 (mA)"
+		document.getElementById("iinput2label").style.display = 'inline';
+		document.getElementById("durationHHlabel").style.display = 'inline';
+		useriinput.value=1;
+		useriinput2.value=1;
+	}
+	else{
+		useriinput2.disabled=true;
+		userdurationHH.disabled=true;
+		useriinput2.classList.remove("shown");
+		useriinput2.classList.add("hidden");
+		userdurationHH.classList.remove("shown");
+		userdurationHH.classList.add("hidden");
+		var iinputlabel = document.getElementById("iinputlabel");
+		iinputlabel.innerText= "I (mA)";
+		document.getElementById("iinput2label").style.display = 'none';
+		document.getElementById("durationHHlabel").style.display = 'none';
 	}
   	oldV = V.slice(); 
   	oldina = ina.slice(); 
@@ -593,8 +626,7 @@ function submit(event) {
   	curd = parseFloat(usercurd.value); 
   	v = parseFloat(userrv.value); 
 	I2 = parseFloat(useriinput2.value);
-	curd2 = parseFloat(usercurd2.value);
-	v = parseFloat(userrv2.value);
+	curd2 = 0;
 	time = parseFloat(userdurationHH.value);
 	nSegments = parseFloat(userseg.value);
 	synLoc = parseFloat(useriinputd.value);
@@ -653,6 +685,10 @@ function buildHH() {
 function hhrun() {
 	if(userDendrite.checked){
 		curd=durationD;
+	}
+	if(userRef.checked){
+		curd2=0.15;
+		curd=0.15;
 	}
 	var loop = Math.ceil(tspan/dt);   // no. of iterations of euler 
 	var loop1 = Math.ceil(curd/dt);
@@ -1482,8 +1518,9 @@ function foolProve() {
 	if (userclampV.value == -50) {userclampV.value = -49.999;}
 	if(usercurd.value==0.1){usercurd.value=0.11;}
 	if(usergcoup.value>2000){usergcoup.value=2000;}
-	if(userseg.value<useriinputd.value){useriinputd.value=userseg.value};
-	if(useriinputd.value==10 && userseg.value!=10){useriinputd.value=userseg.value};
+	if(parseFloat(useriinputd.value)>parseFloat(userseg.value)){useriinputd.value=userseg.value;}
+	//if(userseg.value<useriinputd.value){useriinputd.value=userseg.value};
+	//if(useriinputd.value==10 && userseg.value!=10){useriinputd.value=userseg.value};
 
 
 	
