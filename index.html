@@ -30,8 +30,8 @@
 	<label for="VC"><b>Two step Voltage Clamp</b></label> <input type="checkbox" id="VC2" /><br>
 	<label for="ttx" ><b>Add TTX</b></label> <input type="checkbox" id="ttx" /><br>
 	<label for="tea"><b>Add TEA</b></label> <input type="checkbox" id="tea" /><br>
-	<label for="ref"><b>Refractory Period</b></label> <input type="checkbox" id="ref" /><br>
-	<label for="dendrite"><b>Stick Dendrite</b></label> <input type="checkbox" id="dendrite" />
+	<label for="ref" id="refLabel"><b>Refractory Period</b></label> <input type="checkbox" id="ref" /><br>
+	<label for="dendrite" id="dendLabel"><b>Stick Dendrite</b></label> <input type="checkbox" id="dendrite" />
 	</p>
 	
 	<p id="pbottom"> 
@@ -145,6 +145,13 @@
 		<span class="tooltiptext">Holding voltage before command voltage step is applied.</span> 
 	</label>
     <input type="number" id="restV" step="1" /><br> 
+
+	<!--<label class="tooltip" for="clampVtime" id="clampTime">Time between (mS): 
+		<span class="tooltiptext">Time between voltage applications.</span> 
+	</label>
+	<input type="number" id="clampVtime" step="1" min="0" /> <br> -->
+
+
 	</p> 
 
 	<p id="VC2Panel" class="hidden"> 

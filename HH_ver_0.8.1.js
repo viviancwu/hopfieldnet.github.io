@@ -365,12 +365,17 @@ function VCcheck(event) {
 		userrv.classList.remove("shown"); 
 		userrv.classList.add("hidden"); 
 		document.getElementById("rvlabel").style.display = 'none';
-
-		//usercurd.value = 25; 
+		userDendrite.classList.remove("shown");
+		userDendrite.classList.add("hidden");
+		userRef.classList.remove("shown");
+		userRef.classList.add("hidden");
+		document.getElementById("refLabel").style.display='none';
+		document.getElementById("dendLabel").style.display='none';
 		usercurd.value = 25; 
 		var words = document.getElementById("text");
 		words.innerHTML = "Voltage Clamp";
-		document.getElementById("pbottom").style.maxHeight='160px';
+		document.getElementById("pbottom").style.maxHeight='140px';
+		document.getElementById("ptop").style.maxHeight = "220px";
 		VCsubmit(event); 
 	} else if (!userVCFlag.checked && !userVC2Flag.checked){
 		VC = 0; 
@@ -393,6 +398,14 @@ function VCcheck(event) {
 		var words = document.getElementById("text");
 		words.innerHTML = "Current Clamp";
 		document.getElementById("pbottom").style.maxHeight='400px';
+		userDendrite.classList.add("shown");
+		userDendrite.classList.remove("hidden");
+		userRef.classList.add("shown");
+		userRef.classList.remove("hidden");
+		document.getElementById("refLabel").style.display='inline';
+		document.getElementById("dendLabel").style.display='inline';
+		document.getElementById("ptop").style.maxHeight = "334px";
+		usercurd.value=3;
 		submit(event); 
 	}
 	else if(userVC2Flag.checked && !userVCFlag.checked){
@@ -416,7 +429,14 @@ function VCcheck(event) {
 		usercurd.value = 3; 
 		var words = document.getElementById("text");
 		words.innerHTML = "Voltage Clamp";
-		document.getElementById("pbottom").style.maxHeight='160px';
+		document.getElementById("pbottom").style.maxHeight='140px';
+		userDendrite.classList.remove("shown");
+		userDendrite.classList.add("hidden");
+		userRef.classList.remove("shown");
+		userRef.classList.add("hidden");
+		document.getElementById("refLabel").style.display='none';
+		document.getElementById("dendLabel").style.display='none';
+		document.getElementById("ptop").style.maxHeight = "220px";
 		VCsubmit(event); 
 	}
 	else if(!userVC2Flag.checked){
@@ -441,6 +461,15 @@ function VCcheck(event) {
 		var words = document.getElementById("text");
 		words.innerHTML = "Current Clamp";
 		document.getElementById("pbottom").style.maxHeight='400px';
+		userDendrite.classList.add("shown");
+		userDendrite.classList.remove("hidden");
+		userRef.classList.add("shown");
+		userRef.classList.remove("hidden");
+		document.getElementById("refLabel").style.display='inline';
+		document.getElementById("dendLabel").style.display='inline';
+		document.getElementById("ptop").style.maxHeight = "334px";
+		usercurd.value=3;
+
 		submit(event); 
 	}
 	else if(userVC2Flag.checked){
@@ -464,7 +493,16 @@ function VCcheck(event) {
 		usercurd.value = 3; 
 		var words = document.getElementById("text");
 		words.innerHTML = "Voltage Clamp";
-		document.getElementById("pbottom").style.maxHeight='160px';
+		document.getElementById("pbottom").style.maxHeight='140px';
+
+		userDendrite.classList.remove("shown");
+		userDendrite.classList.add("hidden");
+		userRef.classList.remove("shown");
+		userRef.classList.add("hidden");
+		document.getElementById("refLabel").style.display='none';
+		document.getElementById("dendLabel").style.display='none';
+		document.getElementById("ptop").style.maxHeight = "220px";
+
 		VCsubmit(event); 
 
 	}
