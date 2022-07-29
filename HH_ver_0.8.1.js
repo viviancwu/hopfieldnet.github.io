@@ -3,6 +3,9 @@
 //const { e } = require("mathjs");
 
 //const math = require("mathjs");
+
+
+
 var config = {responsive: true}; 
 
 var layout = {
@@ -141,11 +144,17 @@ var vcoffset = 25/dt;
 var Cm = 0.01; 
 
 var gNa = 1.2;
+var gNad = 0.35; //
   
 var eNa=55.17;
-var gK = 0.36;  
+
+var gK = 0.36;
+var gKd = 0.2;
+
 var eK=-72.14;
 var gL=0.003;  
+var gLd = 0.003;
+
 var eL=-49.42; 
 
 var tspan = 25; 
@@ -162,6 +171,9 @@ var hi = alphaH(v)/(alphaH(v)+betaH(v));
 var h2 = alphaH(v2)/(alphaH(v2)+betaH(v2)); 
 var ni = alphaN(v)/(alphaN(v)+betaN(v)); 
 var n2 = alphaN(v2)/(alphaN(v2)+betaN(v2)); 
+
+var gNap = 0.283333;
+var gKp = 0.555555;
 
 var VC = 0; 
 var clampv = 0; 
@@ -210,9 +222,16 @@ var V = [];
 var m = []; 
 var h = []; 
 var n = []; 
+var md = [];
+var hd =[];
+var nd = [];
+
 var ina = []; 
 var ik = []; 
 var il = []; 
+var inad = [];
+var ikd = [];
+var ild = [];
 var fik = []; 
 var fina = []; 
 var curinjt = []; 
@@ -240,6 +259,7 @@ for(var i=0; i<10; i++){
 	eval('var vMem = vMembrane_'+p+';');
 	vMem.push(vMembrane[0]);
 	vDend.push(vMem);
+	
 }
 
 var userlast10Flag = document.getElementById("last10Trace"); 
@@ -277,6 +297,7 @@ var usernRange = document.getElementById("nRange");
 var userHHpanel1 = document.getElementById("pbottom");
 //var userHHpanel2 = document.getElementById("pbottom2");
 var usertspan = document.getElementById("tspan"); 
+var usertspan2 = document.getElementById("tspan2"); 
 var useriinput = document.getElementById("iinput"); 
 var usercurd = document.getElementById("duration"); 
 var userrv = document.getElementById("rv");
@@ -302,6 +323,11 @@ var userdurationD = document.getElementById("durationD");
 var userd_soma = document.getElementById("d_soma");
 var userd_dend = document.getElementById("d_dend");
 var userl_dend = document.getElementById("l_dend");
+var usergNap = document.getElementById("gNap");
+var usergKp = document.getElementById("gKp");
+
+var usergNapRange = document.getElementById("gNapRange");
+var usergKpRange = document.getElementById("gKpRange");
 
 
 document.getElementById("reset").addEventListener("click", resetPanel); 
@@ -329,6 +355,7 @@ document.getElementById("ni").addEventListener("change", submit);
 document.getElementById("nRange").addEventListener("input", submitSlider); 
 
 document.getElementById("tspan").addEventListener("change", submit); 
+document.getElementById("tspan2").addEventListener("change", VCsubmit); 
 document.getElementById("iinput").addEventListener("change", submit); 
 document.getElementById("duration").addEventListener("change", submit); 
 document.getElementById("rv").addEventListener("change", submit); 
@@ -345,6 +372,10 @@ document.getElementById("durationD").addEventListener("change",submit);
 document.getElementById("d_dend").addEventListener("change", submit);
 document.getElementById("l_dend").addEventListener("change", submit);
 document.getElementById("d_soma").addEventListener("change", submit);
+
+document.getElementById("gNapRange").addEventListener("input", submitSlider);
+document.getElementById("gKpRange").addEventListener("input", submitSlider);
+
 
 
 
@@ -391,12 +422,21 @@ function VCcheck(event) {
 		userclamptime.classList.add("shown");
 		userclamptime.classList.remove("hidden");
 		document.getElementById("clampVlabel").style.display='inline';
+		var text = document.getElementById("cv");
+		text.innerText = 'Command voltage for S1 (mV)';
+		var dur = document.getElementById("d");
+		dur.innerText = 'Duration of S1 and S2 (mS)';
+
 		VCsubmit(event);
 	}
 	else if(!userVC2Flag.checked){
 		userclamptime.classList.add("hidden");
 		userclamptime.classList.remove("shown");
 		document.getElementById("clampVlabel").style.display='none';
+		var text = document.getElementById("cv");
+		text.innerText = 'Command voltage (mV)';
+		var dur = document.getElementById("d");
+		dur.innerText = 'Duration (mS)';
 		VCsubmit(event);
 	}
 }
@@ -440,6 +480,7 @@ function initialize() {
 	userni.value = ni; 
 	usernRange.value = ni; 
 	usertspan.value = tspan; 
+	usertspan2.value=tspan;
 	useriinput.value = 0.45; 
 	useriinput2.value = 0.45;
 	usercurd.value = curd; 
@@ -450,15 +491,20 @@ function initialize() {
 	userclamptime.value=clamptime;
 	userdurationV.value=5;
 	userrestV.value = restv;
-	userdurationHH.value = time;
+	userdurationHH.value = 5;
 	usergcoup.value = g_coupl;
-	userseg.value = nSegments;
-	useriinputd.value = synLoc;
+	userseg.value = 1;
+	useriinputd.value = 0;
 	usercurrentinj.value = 0.1;
 	userdurationD.value=durationD;
 	userd_dend.value = d_dend;
 	userd_soma.value = d_soma;
 	userl_dend.value = l_dend;
+	usergNap.value = gNap;
+	usergKp.value = gKp;
+	usergNapRange.value = gNap;
+	usergKpRange.value = gKp;
+
 
   	
 	if (VC) {
@@ -497,6 +543,8 @@ function submitSlider(event) {
 	usermi.value = usermRange.value; 
 	userhi.value = userhRange.value; 
 	userni.value = usernRange.value; 
+	usergNap.value = usergNapRange.value;
+	usergKp.value = usergKpRange.value;
 	submit(event); 
 }
 
@@ -528,6 +576,9 @@ function submit(event) {
 		useriinput2.classList.remove("hidden");
 		userdurationHH.classList.add("shown");
 		userdurationHH.classList.remove("hidden");
+		userDpanel.classList.add("hidden");
+		userDpanel.classList.remove("shown");
+		userDendrite.checked=false;
 		var iinputlabel = document.getElementById("iinputlabel");
 		iinputlabel.innerText="Stim 1 (mA)"
 		document.getElementById("iinput2label").style.display = 'inline';
@@ -580,11 +631,11 @@ function submit(event) {
   	hi = parseFloat(userhi.value);
   	ni = parseFloat(userni.value); 
 
+	l_seg = l_dend/nSegments;
 	A_soma = 4*Math.PI*(d_soma/2)^2;
 	A_seg = 2*Math.PI*(d_dend/2)*l_seg;
 	R_seg = d_dend*l_dend/(2*d_soma*nSegments)*R_input;
 	tauM_seg = R_seg*1e6*C_M*1e-12*1e3;
-	l_seg = l_dend/nSegments;
 
   
   	buildHH(); 
@@ -603,6 +654,12 @@ function buildHH() {
 	ina = []; 
 	ik = []; 
 	il = []; 
+	md = [];
+	hd = [];
+	nd = [];
+	inad = [];
+	ikd = [];
+	ild = [];
 	fik = []; 
 	fina = []; 
 	curinj = []; 
@@ -614,6 +671,16 @@ function buildHH() {
 	for(var i=0; i<10; i++)[
 		vDend[i]=[restv]
 	]
+	for(var i=0; i<nSegments; i++){
+		inad.push([]);
+		ikd.push([]);
+		ild.push([]);
+		md.push([]);
+		hd.push([]);
+		nd.push([]);
+	}
+	gNad = gNa*usergNap.value;
+	gKd = gK*usergKp.value;
 	hhrun(); 
 }
 
@@ -639,7 +706,7 @@ function hhrun() {
 	}
 
 	t.push(0); 
-	V.push(v); 
+	V.push(v);
 
 	if (usercustomFlag.checked) {
 		m.push(mi); 
@@ -649,7 +716,11 @@ function hhrun() {
 		m.push(alphaM(v)/(alphaM(v)+betaM(v))); 
 		h.push(alphaH(v)/(alphaH(v)+betaH(v))); 
 		n.push(alphaN(v)/(alphaN(v)+betaN(v))); 
-
+		for(var i=0; i<nSegments; i++){
+			(md[i]).push(alphaM(v)/(alphaM(v)+betaM(v)));
+			(hd[i]).push(alphaM(v)/(alphaM(v)+betaM(v)));
+			(nd[i]).push(alphaN(v)/(alphaN(v)+betaN(v))); 
+		}
 		usermi.value = m[0]; 
 		usermRange.value = m[0]; 
 		userni.value = n[0]; 
@@ -666,6 +737,13 @@ function hhrun() {
 	ik.push(gK*Math.pow(n[0],4)*(V[0]-eK)); 
 	il.push(gL*(V[0]-eL)); 
 	itt.push(ina[0]+ik[0]+il[0]); 
+	for(var i=0; i<nSegments; i++){
+		var inad1 = inad[i];
+		inad1.push((gNad*Math.pow(md[i][0],3)*hd[i][0]*(vDend[i][0]-eNa)));
+		inad[i]=inad1;
+		ikd[i].push(gKd*Math.pow(nd[i][0],4)*(vDend[i][0]-eK));
+		ild[i].push(gLd*(vDend[i][0]-eL)); 
+	}
 
 
 	for (var i = 1; i < offset+1; i++) {
@@ -680,7 +758,13 @@ function hhrun() {
 		itt.push(ina[i]+ik[i]+il[i]);
 		if(userDendrite.checked){
 		for(var j=0; j<nSegments; j++){
-			vDend[j].push(restv);
+			vDend[j].push(vDend[j][i-1] + dt*(1/Cm)*(0-(inad[j][i-1] + ikd[j][i-1] + ild[j][i-1]))); 
+			md[j].push(md[j][i-1] + dt*(alphaM(vDend[j][i-1])*(1-md[j][i-1]) - betaM(vDend[j][i-1])*md[j][i-1])); 
+			hd[j].push(hd[j][i-1] + dt*(alphaH(vDend[j][i-1])*(1-hd[j][i-1]) - betaH(vDend[j][i-1])*hd[j][i-1])); 
+			nd[j].push(nd[j][i-1] + dt*(alphaN(vDend[j][i-1])*(1-nd[j][i-1]) - betaN(vDend[j][i-1])*nd[j][i-1])); 
+			inad[j].push(gNad*Math.pow(md[j][i],3)*hd[j][i]*(vDend[j][i]-eNa)); 
+			ikd[j].push(gKd*Math.pow(nd[j][i],4)*(vDend[j][i]-eK));
+			ild[j].push(gLd*(vDend[j][i]-eL));
 		}
 	}
 	}
@@ -695,11 +779,13 @@ function hhrun() {
 			curinj.push(I); 
 		} else if((i-offset)>=loop1 && i-offset<loop2){
 			V.push(V[i] + dt*(1/Cm)*(0-(Ich = ina[i] + ik[i] + il[i]))); 
+			//no current injection
 		}
 		else if(i-offset>=loop2 && i-offset<loop3){
 			V.push(V[i] + dt*(1/Cm)*(I2-(Ich = ina[i] + ik[i] + il[i]))); 
 			curinjt2.push(tspan*(i)/loop); 
 			curinj2.push(I); 
+			//yes current injection
 		}
 		else if(i-offset>=loop2){
 			V.push(V[i] + dt*(1/Cm)*(0-(Ich = ina[i] + ik[i] + il[i])));
@@ -739,9 +825,16 @@ function hhrun() {
 
 			}
 			else{
-				vDendCurr.push(vDendCurr[i]+dt*(1/C_M)*(currLeft+currRight));
+				vDendCurr.push(vDendCurr[i]+dt*(1/C_M)*(currLeft+currRight-(Ich = inad[j][i] + ikd[j][i] + ild[j][i])));
 			}
 			vDend[j]=vDendCurr;
+			md[j].push(md[j][i] + dt*(alphaM(vDend[j][i])*(1-md[j][i]) - betaM(vDend[j][i])*md[j][i]));
+			hd[j].push(hd[j][i] + dt*(alphaH(vDend[j][i])*(1-hd[j][i]) - betaH(vDend[j][i])*hd[j][i]));
+			nd[j].push(nd[j][i] + dt*(alphaN(vDend[j][i])*(1-nd[j][i]) - betaN(vDend[j][i])*nd[j][i]));
+			
+			inad[j].push(gNad*Math.pow(md[j][i+1],3)*hd[j][i+1]*(vDend[j][i+1]-eNa)); 
+			ikd[j].push(gKd*Math.pow(nd[j][i+1],4)*(vDend[j][i+1]-eK)); 
+			ild[j].push(gLd*(vDend[j][i+1]-eL)); 
 		}
 	}
 }
@@ -767,24 +860,30 @@ else{
 		}
 		if(synLoc==j+1){
 			if(i-offset<loop1){
-			vDendCurr.push(vDendCurr[i]+dt*(1/C_M)*(currentinj-(currLeft+currRight)));
+			vDendCurr.push(vDendCurr[i]+dt*(1/C_M)*(currentinj-(currLeft+currRight)-(Ich = inad[j][i] + ikd[j][i] + ild[j][i])));
 			curinjt.push(tspan*(i)/loop); 
 			curinj.push(currentinj); 
 			}
 			else{
-				vDendCurr.push(vDendCurr[i]+dt*(1/C_M)*(currLeft+currRight));
+				vDendCurr.push(vDendCurr[i]+dt*(1/C_M)*((currLeft+currRight)-(Ich = inad[j][i] + ikd[j][i] + ild[j][i])));
 			}
 		}
 		else{
-			vDendCurr.push(vDendCurr[i]+dt*(1/C_M)*(currLeft+currRight));
+			vDendCurr.push(vDendCurr[i]+dt*(1/C_M)*((currLeft+currRight)-(Ich = inad[j][i] + ikd[j][i] + ild[j][i])));
 		}
 		vDend[j]=vDendCurr;
+		md[j].push(md[j][i] + dt*(alphaM(vDend[j][i])*(1-md[j][i]) - betaM(vDend[j][i])*md[j][i])); 
+		hd[j].push(hd[j][i] + dt*(alphaH(vDend[j][i])*(1-hd[j][i]) - betaH(vDend[j][i])*hd[j][i])); 
+		nd[j].push(nd[j][i] + dt*(alphaN(vDend[j][i])*(1-nd[j][i]) - betaN(vDend[j][i])*nd[j][i])); 
+		
+		inad[j].push(gNad*Math.pow(md[j][i+1],3)*hd[j][i+1]*(vDend[j][i+1]-eNa)); 
+		ikd[j].push(gKd*Math.pow(nd[j][i+1],4)*(vDend[j][i+1]-eK)); 
+		ild[j].push(gLd*(vDend[j][i+1]-eL)); 
 	}
 	if(synLoc>0){
 		vRight=vDend[0];
 		currRight = g_coupl*1e-9/(A_soma*1e-6)*(vRight[i]-V[i]);
 		V.push(V[i]+dt*(1/C_M)*(currRight-(Ich = ina[i] + ik[i] + il[i])));
-
 		m.push(m[i] + dt*(alphaM(V[i])*(1-m[i]) - betaM(V[i])*m[i])); 
 		h.push(h[i] + dt*(alphaH(V[i])*(1-h[i]) - betaH(V[i])*h[i])); 
 		n.push(n[i] + dt*(alphaN(V[i])*(1-n[i]) - betaN(V[i])*n[i])); 
@@ -839,7 +938,7 @@ else{
 		type: 'scatter', 
 		name: 'V<sub>m</sub>'+i, 
 		line: {
-		  color: 'rgba(219, 64, 82,'+value+')',
+		  color: `rgb(${128+(nSegments-i-1)*10}, ${128+(nSegments-i-1)*10}, ${128+(nSegments-i-1)*10})`,
 		  width: 2
 	  }
 	}; 
@@ -854,8 +953,8 @@ else{
   		name: 'last trace', 
   		line: {
     		color: 'rgb(255, 165, 0)',
-    		width: 1.5,
-			dash: 'dot'
+    		width: 1.5
+			//dash: 'dot'
     	}
   	};
 
@@ -1089,7 +1188,7 @@ function VCsubmit(event) {
 	buildQ(ittQ, itt.slice()); 
 
   	foolProve(); 
-  	tspan = parseFloat(usertspan.value); 
+  	tspan = parseFloat(usertspan2.value); 
   	I = parseFloat(useriinput.value); 
   	curd = parseFloat(usercurd.value); 
   	v = parseFloat(userrv.value); 
@@ -1173,6 +1272,7 @@ function vcrun() {
 		ik.push(gK*Math.pow(n[i],4)*(V[i]-eK)); 
 		il.push(gL*(V[i]-eL)); 
 		itt.push(ina[i]+ik[i]+il[i]); 
+		
 	}
 
 	for (var i = 0; i < loop; i++) {
@@ -1451,8 +1551,10 @@ function foolProve() {
 	if (userclampV.value == -35) {userclampV.value = -34.999;}
 	if (userclampV.value == -50) {userclampV.value = -49.999;}
 	if(usercurd.value==0.1){usercurd.value=0.11;}
-	if(usergcoup.value>2000){usergcoup.value=2000;}
+	if(useriinput2.value>5){useriinput2.value=5;}
+	//if(usergcoup.value>2000){usergcoup.value=2000;}
 	if(parseFloat(useriinputd.value)>parseFloat(userseg.value)){useriinputd.value=userseg.value;}
+	if(durationHH.value<5){durationHH.value=5;}
 	//if(userseg.value<useriinputd.value){useriinputd.value=userseg.value};
 	//if(useriinputd.value==10 && userseg.value!=10){useriinputd.value=userseg.value};
 
@@ -1600,3 +1702,4 @@ function prepareKQ(queue) {
 	}
 	return output; 
 }
+

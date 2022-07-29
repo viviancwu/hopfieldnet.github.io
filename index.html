@@ -97,12 +97,16 @@
 	</p>
 
 	<p id="VCPanel" class="hidden"> <strong> V-Clamp settings: </strong> <br>
-	<label class="tooltip" for="mean">Command voltage (mV): 
-		<span class="tooltiptext">The voltage at which the cell is clamped.</span> 
+	<label class="tooltip" for="tspan2">Simulation Window (ms): 
+		<span class="tooltiptext">Time span of the simulation.</span> 
+	</label>
+	<input type="number" id="tspan2" step="1" min="0" /> <br> 
+	<label class="tooltip" for="mean" id="cv">Command voltage (mV) 
+		<span class="tooltiptext">The voltage at which the cell is clamped</span> 
 	</label>
     <input type="number" id="clampV" step="5" /><br>
-	<label class="tooltip" for="durationV">Duration (ms): 
-		<span class="tooltiptext">Duration of input current.</span> 
+	<label class="tooltip" for="durationV" id="d">Duration (ms): 
+		<span class="tooltiptext">Duration of voltage clamp.</span> 
 	</label>
     <input type="number" id="durationV" step="1" min="0" /> <br>
     <label class="tooltip" for="restV">V<sub>i</sub> (mV): 
@@ -116,7 +120,7 @@
   		<option value="membrane">Membrane</option>
 	</select><br>-->
 
-	<label class="tooltip" for="clampVtime" id="clampVlabel">Step Duration (mS): 
+	<label class="tooltip" for="clampVtime" id="clampVlabel">Interval between S1 and S2 (ms):
 		<span class="tooltiptext">Time between voltage applications.</span> 
 	</label>
 	<input type="number" id="clampVtime" step="1" min="0" />
@@ -142,31 +146,42 @@
 		<label id="iinputlabel" class="tooltip" for="iinputd">Location 
 			<span class="tooltiptext">Location of current inj</span> 
 		</label>
-		<input type="number" id="iinputd" step="0.01" /> <br>
+		<input type="number" id="iinputd" step="1" min="0"/> <br>
 		<label id="rvlabel" class="tooltip" for="gcoup">g coupling 
 			<span class="tooltiptext">Dendritic conductance (max: 2000)</span> 
 		</label>
-		<input type="number" id="gcoup" step="1" /><br>
-		<label id="currin" class="tooltip" for="currinj">currnt injected (mA)
+		<input type="number" id="gcoup" step="0.01" /><br>
+		<label id="currin" class="tooltip" for="currinj">Current injected (mA)
 			<span class="tooltiptext">current at synapse</span> 
 		</label>
-		<input type="number" id="currentinj" step="1" /><br>
+		<input type="number" id="currentinj" step="0.1" /><br>
 		<label id="dur" class="tooltip" for="dura">Duration (ms)
 			<span class="tooltiptext">Duration of injection</span> 
 		</label>
 		<input type="number" id="durationD" step="1" /><br>
-		<label id="somad" class="tooltip" for="d_soma">Soma Diameter (uM)
+		<label id="somad" class="tooltip" for="d_soma">Soma Diameter (<i>u</i>m)
 			<span class="tooltiptext">Diameter of the soma in nm</span> 
 		</label>
 		<input type="number" id="d_soma" step="1" /><br>
-		<label id="dendd" class="tooltip" for="d_dend">Dendrite Diameter (uM)
+		<label id="dendd" class="tooltip" for="d_dend">Dendrite Diameter (<i>u</i>m)
 			<span class="tooltiptext">Diameter of the dendrite in nm</span> 
 		</label>
 		<input type="number" id="d_dend" step="1" /><br>
-		<label id="dendl" class="tooltip" for="l_dend">Dendrite length (uM)
+		<label id="dendl" class="tooltip" for="l_dend">Dendrite length (<i>u</i>m)
 			<span class="tooltiptext">length of the dendrite in nm</span> 
 		</label>
 		<input type="number" id="l_dend" step="1" /><br><br>
+		<label class="tooltip" for="gNap" style="color:rgb(55, 128, 191);">gNa: 
+			<span class="tooltiptext">Ratio of Dendritic gNa relative to Soma gNa</span> 
+		</label>
+		<input type="number" id="gNap" step="0.01" min="0" max="1"> <br> 
+		<input type="range" id="gNapRange" step="0.01" min="0" max="1" class="slider">
+
+		<label class="tooltip" for="gKp" style="color:rgb(255, 165, 0);">gK: 
+			<span class="tooltiptext">Ratio of Dendritic gK relative to Soma gK</span> 
+		</label>
+		<input type="number" id="gKp" step="0.01" min="0" max="1" /> <br> 
+		<input type="range" id="gKpRange" step="0.01" min="0" max="1" class="slider"> <br>
 		</p> 
 		
   </div>
