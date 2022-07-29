@@ -395,6 +395,9 @@ function VCcheck(event) {
 		userVCpanel.classList.remove("hidden");
 		userHHpanel1.classList.add("hidden");
 		userHHpanel1.classList.remove("shown");
+		userDpanel.classList.add("hidden");
+		userDpanel.classList.remove("shown");
+
 		userVCFlag.checked=false;
 
 		VCsubmit(event); 
@@ -570,15 +573,20 @@ function submit(event) {
 
 	}
 	if(userRef.checked){
+		if(userDendrite.checked){
+			userDendrite.checked=false;
+			userDpanel.classList.add("hidden");
+			userDpanel.classList.remove("shown");
+			userHHpanel1.classList.remove("hidden");
+			userHHpanel1.classList.add("shown");
+
+		}
 		useriinput2.disabled=false;
 		userdurationHH.disabled=false;
 		useriinput2.classList.add("shown");
 		useriinput2.classList.remove("hidden");
 		userdurationHH.classList.add("shown");
 		userdurationHH.classList.remove("hidden");
-		userDpanel.classList.add("hidden");
-		userDpanel.classList.remove("shown");
-		userDendrite.checked=false;
 		var iinputlabel = document.getElementById("iinputlabel");
 		iinputlabel.innerText="Stim 1 (mA)"
 		document.getElementById("iinput2label").style.display = 'inline';
@@ -681,6 +689,9 @@ function buildHH() {
 	}
 	gNad = gNa*usergNap.value;
 	gKd = gK*usergKp.value;
+	document.getElementById("gNav").innerText = gNad+" S";
+	document.getElementById("gKv").innerText = gKd+" S";
+
 	hhrun(); 
 }
 
