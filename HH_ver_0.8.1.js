@@ -397,9 +397,7 @@ function VCcheck(event) {
 		userHHpanel1.classList.remove("shown");
 		userDpanel.classList.add("hidden");
 		userDpanel.classList.remove("shown");
-
 		userVCFlag.checked=false;
-
 		VCsubmit(event); 
 	}
 	else if(userRCFlag.checked){
