@@ -425,6 +425,10 @@ function VCcheck(event) {
 		document.getElementById("clampVlabel").style.display='inline';
 		var text = document.getElementById("cv");
 		text.innerText = 'Command voltage for S1 (mV)';
+		var inner = document.createElement('span');
+		inner.className = "tooltiptext";
+		inner.innerText = "command voltage for S2 is set at 0";
+		text.appendChild(inner);
 		var dur = document.getElementById("d");
 		dur.innerText = 'Duration of S1 and S2 (mS)';
 
@@ -1019,8 +1023,8 @@ else{
   		name: 'last I<sub>Na</sub>', 
   		line: {
     		color: 'rgb(51, 181, 229)',
-    		width: 1.5,
-			dash: 'dot'
+    		width: 1.5
+			//dash: 'dot'
     	}
   	};
 
@@ -1043,8 +1047,8 @@ else{
   		name: 'last I<sub>K</sub>', 
   		line: {
     		color: 'rgb(34, 139, 34)',
-    		width: 1.5,
-			dash: 'dot'
+    		width: 1.5
+			//dash: 'dot'
     	}
   	};
 
@@ -1122,8 +1126,8 @@ else{
   		name: 'last I<sub>t</sub>', 
   		line: {
     		color: 'rgb(128, 128, 128)',
-    		width: 1.5,
-			dash: 'dot'
+    		width: 1.5
+			//dash: 'dot'
     	}
   	};
 
@@ -1360,8 +1364,8 @@ function VCdraw() {
   		name: 'last trace', 
   		line: {
     		color: 'rgb(255, 165, 0)',
-    		width: 1.5,
-			dash: 'dot'
+    		width: 1.5
+			//dash: 'dot'
     	}
   	};
 
@@ -1417,8 +1421,8 @@ function VCdraw() {
   		name: 'last I<sub>Na</sub>', 
   		line: {
     		color: 'rgb(51, 181, 229)',
-    		width: 1.5,
-			dash: 'dot'
+    		width: 1.5
+			//dash: 'dot'
     	}
   	};
 
@@ -1441,8 +1445,8 @@ function VCdraw() {
   		name: 'last I<sub>K</sub>', 
   		line: {
     		color: 'rgb(34, 139, 34)',
-    		width: 1.5,
-			dash: 'dot'
+    		width: 1.5
+			//dash: 'dot'
     	}
   	};
 
@@ -1465,8 +1469,8 @@ function VCdraw() {
   		name: 'last I<sub>t</sub>', 
   		line: {
     		color: 'rgb(128, 128, 128)',
-    		width: 1.5,
-			dash: 'dot'
+    		width: 1.5
+			//dash: 'dot'
     	}
   	};
 
@@ -1635,11 +1639,12 @@ function preparettQ(queue) {
   		y: queue[i],
   		type: 'scatter', 
   		mode: 'lines',
+		hoverinfo:'skip',
   		name: `I<sub>t</sub> No.${i+1}`, 
   		line: {
     		color: `rgb(${128+(queue.length-i-1)*10}, ${128+(queue.length-i-1)*10}, ${128+(queue.length-i-1)*10})`,
-    		width: 1.5,
-			dash: 'dot'
+    		width: 1.5
+			//dash: 'dot'
     		}
   		}; 
 
@@ -1657,6 +1662,7 @@ function prepareVQ(queue) {
 		hoverinfo:'skip',
   		type: 'scatter', 
   		mode: 'lines',
+		hoverinfo:'skip',
   		name: `V<sub>m</sub> No.${i+1}`, 
   		line: {
     		color: '#33b5e5',//`rgb(255, ${165+(queue.length-i-1)/10*(255-165)}, ${0+(queue.length-i-1)/10*(255-0)})`,
@@ -1678,11 +1684,12 @@ function prepareNaQ(queue) {
   		y: queue[i],
   		type: 'scatter', 
   		mode: 'lines',
+		hoverinfo:'skip',
   		name: `I<sub>Na</sub> No.${i+1}`, 
   		line: {
     		color: `rgb(${51+(queue.length-i-1)/10*(229-51)}, ${181+(queue.length-i-1)/10*(229-181)}, 229)`,
-    		width: 1.5,
-			dash: 'dot'
+    		width: 1.5
+			//dash: 'dot'
     		}
   		}; 
 
@@ -1699,11 +1706,12 @@ function prepareKQ(queue) {
   		y: queue[i],
   		type: 'scatter', 
   		mode: 'lines',
+		hoverinfo:'skip',
   		name: `I<sub>K</sub> No.${i+1}`, 
   		line: {
     		color: `rgb(${34+(queue.length-i-1)/10*(224-34)}, ${139+(queue.length-i-1)/10*(224-139)}, ${34+(queue.length-i-1)/10*(224-34)})`,
-    		width: 1.5,
-			dash: 'dot'
+    		width: 1.5
+			//dash: 'dot'
     		}
   		}; 
 
