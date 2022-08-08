@@ -178,10 +178,10 @@ function hopfield(){
                 else if(s[i]<1){
                     s[i]=-1;
                 }
-                //if(variable==1){
+                if(variable==1){
                     eval('var cloneS'+i+'= JSON.parse(JSON.stringify(s));');
                     eval('inputmatrices.push(cloneS'+i+');');
-                //}
+                }
                 counterfornow=0;
                 for(var q=0; q<weightsize; q++){
                     for(var w=0; w<weightsize; w++){
@@ -189,9 +189,9 @@ function hopfield(){
                     }
                 }
                 E_temp.push(counterfornow);
-                //if(variable==1){
+                if(variable==1){
                     alllyapunov.push(counterfornow);
-                //}
+                }
             }
             
             mem_work = JSON.parse(JSON.stringify(s));
@@ -628,7 +628,7 @@ function animation(currentmatrix, count, lyapunov){
     var start;
     count= parseFloat(count);
     var num = JSON.parse(JSON.stringify(count));
-    if((count)%(2*matrixSize*matrixSize+1)==0){
+    if((count)%(matrixSize*matrixSize+1)==0){
         start=count;
         sessionStorage.setItem("start", start);
     }
@@ -683,7 +683,7 @@ for(var p=0; p<matrixSize; p++){
         }];
         let layout1 = {
             xaxis:{
-                range: [0, 2*matrixSize*matrixSize]
+                range: [0, matrixSize*matrixSize]
             },
             yaxis: {
                 range: [ysmall, ylarge]
@@ -710,7 +710,7 @@ function contAnimate(){
     let countBox = document.getElementById("countbox");
     let matrixnum = parseFloat(countBox.innerText);
     let animateCount =countEl.innerText;
-    if(animateCount>memnum*(2*matrixSize*matrixSize+1)){
+    if(animateCount>memnum*(matrixSize*matrixSize+1)){
         animateCount=0;
         matrixnum=0;
         countBox.innerText = matrixnum;
@@ -731,7 +731,7 @@ function contAnimate(){
     animateCount++;
     countEl.innerText = animateCount;
     let statement = document.getElementById("startIt");
-    if((animateCount)%(2*matrixSize*matrixSize+1)==0 /*|| animateCount == document.getElementById("memorynum").value*doublethat*/){
+    if((animateCount)%(matrixSize*matrixSize+1)==0 /*|| animateCount == document.getElementById("memorynum").value*doublethat*/){
         clearInterval(myInt);
         matrixnum++;
         countBox.innerText = matrixnum;
