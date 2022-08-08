@@ -621,15 +621,12 @@ function reset(){
 
 function animation(currentmatrix, count, lyapunov){
     let countBox = document.getElementById("countbox");
-    let matrixnum = parseFloat(countBox.innerText);
-    const matrixSize = document.getElementById("matrixSize").value;
-    var numofmatrix = (lyapunov.length)/(matrixSize*matrixSize+1);
-    var range1 = matrixSize+1;
-    let s = currentmatrix;
+    const matrixSize = parseFloat(document.getElementById("matrixSize").value);
     let m=0;
     var xlyapunov = [];
     var ylyapunov=[];
     var start;
+    count= parseFloat(count);
     var num = JSON.parse(JSON.stringify(count));
     if((count)%(matrixSize*matrixSize+1)==0){
         start=count;
